@@ -333,15 +333,20 @@ class KiwoomAPIClient:
 
     # ========== 종목 정보 ==========
 
-    def get_stock_list(self, market_type: str = "ALL") -> Dict:
+    def get_stock_list(self, market_type: str = "0") -> Dict:
         """
         종목 리스트 조회
 
         Args:
-            market_type: 시장구분 (ALL, KOSPI, KOSDAQ, ETF, ETN)
+            market_type: 시장구분
+                - "0": 전체
+                - "1": 코스피
+                - "2": 코스닥
+                - "3": ETF
+                - "4": ETN
         """
         body = {
-            "mkt_tp": market_type
+            "mrkt_tp": market_type
         }
 
         return self._make_request("POST", "/api/dostk/stkinfo", "ka10099", body)

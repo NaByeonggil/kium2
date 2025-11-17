@@ -45,15 +45,8 @@ CREATE TABLE IF NOT EXISTS tick_data (
 
     INDEX idx_stock_time (stock_code, tick_time),
     INDEX idx_time (tick_time)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='실시간 틱데이터'
-PARTITION BY RANGE (TO_DAYS(tick_time)) (
-    PARTITION p_202411 VALUES LESS THAN (TO_DAYS('2024-12-01')),
-    PARTITION p_202412 VALUES LESS THAN (TO_DAYS('2025-01-01')),
-    PARTITION p_202501 VALUES LESS THAN (TO_DAYS('2025-02-01')),
-    PARTITION p_202502 VALUES LESS THAN (TO_DAYS('2025-03-01')),
-    PARTITION p_202503 VALUES LESS THAN (TO_DAYS('2025-04-01')),
-    PARTITION p_future VALUES LESS THAN MAXVALUE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='실시간 틱데이터';
+-- Note: 파티션은 데이터 증가 시 추가 예정
 
 -- ============================================
 -- 3. 분봉 데이터 (틱 집계)

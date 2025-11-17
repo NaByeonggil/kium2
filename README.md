@@ -228,3 +228,4 @@ This project is for educational purposes only.
 
 **버전**: 0.1.0 (Phase 0 완료)
 **최종 업데이트**: 2025-11-15
+# kium2
