@@ -1,0 +1,94 @@
+# ============================================
+# Docker Ignore - 컨테이너 빌드 시 제외할 파일
+# ============================================
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+venv/
+ENV/
+env/
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# 로그 파일
+logs/
+*.log
+
+# 데이터 파일
+data/
+*.db
+*.sqlite
+*.sqlite3
+
+# 환경변수 (보안)
+.env
+.env.local
+.env.*.local
+
+# 테스트
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+
+# Docker
+docker-compose.override.yml
+Dockerfile
+.dockerignore
+
+# 문서 (빌드 시 불필요)
+docs/
+*.md
+LICENSE
+
+# 백업 파일
+*.bak
+*.backup
+*.tmp
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Node.js (frontend 개발 시)
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# 기타
+*.pdf
+*.xlsx
+*.xls

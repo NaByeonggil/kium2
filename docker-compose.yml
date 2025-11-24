@@ -1,0 +1,227 @@
+services:
+  # ============================================
+  # Sub Server - 틱데이터 수집 서버
+  # ============================================
+  sub-server:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.sub-server
+    container_name: kium2-sub-server
+    ports:
+      - "${SUB_SERVER_PORT:-8001}:8001"
+    environment:
+      # 키움 API 설정
+      - KIWOOM_APP_KEY=${KIWOOM_APP_KEY}
+      - KIWOOM_SECRET_KEY=${KIWOOM_SECRET_KEY}
+      - KIWOOM_IS_MOCK=${KIWOOM_IS_MOCK:-true}
+
+      # 서버 설정
+      - SUB_SERVER_PORT=8001
+      - PYTHONUNBUFFERED=1
+
+      # 데이터베이스 설정
+      - DB_HOST=mariadb
+      - DB_PORT=3306
+      - DB_USER=${DB_USER:-kium_user}
+      - DB_PASSWORD=${DB_PASSWORD:-kium_password}
+      - DB_NAME=${DB_NAME:-gslts_trading}
+
+      # Redis 설정
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-}
+      - REDIS_DB=${REDIS_DB:-0}
+
+      # 로깅 설정
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - LOG_FILE_ENABLED=${LOG_FILE_ENABLED:-true}
+      - LOG_DIR=/app/logs
+    volumes:
+      - ./sub_server:/app/sub_server
+      - ./config:/app/config
+      - ./logs:/app/logs
+      - ./data:/app/data
+    depends_on:
+      mariadb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - kium2-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/api/status"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # ============================================
+  # MariaDB - 데이터베이스
+  # ============================================
+  mariadb:
+    image: mariadb:10.11
+    container_name: kium2-mariadb
+    ports:
+      - "${DB_PORT:-3306}:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD:-root_password}
+      - MYSQL_DATABASE=${DB_NAME:-gslts_trading}
+      - MYSQL_USER=${DB_USER:-kium_user}
+      - MYSQL_PASSWORD=${DB_PASSWORD:-kium_password}
+      - TZ=Asia/Seoul
+    volumes:
+      - mariadb-data:/var/lib/mysql
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+      - ./database/mariadb-config.cnf:/etc/mysql/conf.d/custom.cnf:ro
+    networks:
+      - kium2-network
+    restart: unless-stopped
+    command: >
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_unicode_ci
+      --max_connections=200
+      --innodb_buffer_pool_size=512M
+      --innodb_log_file_size=128M
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+  # ============================================
+  # Redis - 캐싱 & 실시간 데이터
+  # ============================================
+  redis:
+    image: redis:7.2-alpine
+    container_name: kium2-redis
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    environment:
+      - TZ=Asia/Seoul
+    volumes:
+      - redis-data:/data
+    networks:
+      - kium2-network
+    restart: unless-stopped
+    command: >
+      redis-server
+      --bind 0.0.0.0
+      --appendonly yes
+      --maxmemory 256mb
+      --maxmemory-policy allkeys-lru
+      --save 900 1
+      --save 300 10
+      --save 60 10000
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # ============================================
+  # Prometheus - 메트릭 수집
+  # ============================================
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: kium2-prometheus
+    ports:
+      - "${PROMETHEUS_PORT:-9090}:9090"
+    volumes:
+      - ./docker/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    networks:
+      - kium2-network
+    restart: unless-stopped
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=15d'
+    depends_on:
+      - sub-server
+
+  # ============================================
+  # Grafana - 모니터링 대시보드
+  # ============================================
+  grafana:
+    image: grafana/grafana:latest
+    container_name: kium2-grafana
+    ports:
+      - "${GRAFANA_PORT:-3000}:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
+      - GF_SERVER_ROOT_URL=http://localhost:3000
+      - GF_INSTALL_PLUGINS=redis-datasource
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./docker/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./docker/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    networks:
+      - kium2-network
+    restart: unless-stopped
+    depends_on:
+      - prometheus
+      - redis
+
+  # ============================================
+  # Redis Commander - Redis 관리 도구 (선택사항)
+  # ============================================
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: kium2-redis-commander
+    ports:
+      - "${REDIS_COMMANDER_PORT:-8081}:8081"
+    environment:
+      - REDIS_HOSTS=local:redis:6379:0:${REDIS_PASSWORD:-}
+    networks:
+      - kium2-network
+    restart: unless-stopped
+    depends_on:
+      - redis
+    profiles:
+      - tools
+
+  # ============================================
+  # phpMyAdmin - MariaDB 관리 도구 (선택사항)
+  # ============================================
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: kium2-phpmyadmin
+    ports:
+      - "${PHPMYADMIN_PORT:-8080}:80"
+    environment:
+      - PMA_HOST=mariadb
+      - PMA_PORT=3306
+      - PMA_USER=${DB_USER:-kium_user}
+      - PMA_PASSWORD=${DB_PASSWORD:-kium_password}
+      - UPLOAD_LIMIT=50M
+    networks:
+      - kium2-network
+    restart: unless-stopped
+    depends_on:
+      - mariadb
+    profiles:
+      - tools
+
+# ============================================
+# Networks
+# ============================================
+networks:
+  kium2-network:
+    name: kium2-network
+    driver: bridge
+
+# ============================================
+# Volumes
+# ============================================
+volumes:
+  mariadb-data:
+    name: kium2-mariadb-data
+  redis-data:
+    name: kium2-redis-data
+  prometheus-data:
+    name: kium2-prometheus-data
+  grafana-data:
+    name: kium2-grafana-data

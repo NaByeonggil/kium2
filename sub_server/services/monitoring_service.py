@@ -84,13 +84,56 @@ class MonitoringService:
                 'stock_count': stats['stock_count'],
                 'buffer_usage_percent': round(
                     (stats['buffer_size'] / self.tick_collector.buffer_size * 100), 2
-                ) if self.tick_collector.buffer_size > 0 else 0
+                ) if self.tick_collector.buffer_size > 0 else 0,
+                'collection_mode': stats.get('collection_mode', 'unknown')
             }
         except Exception as e:
             logger.error(f"수집기 통계 조회 실패: {e}")
             return {
                 'status': 'error',
                 'is_running': False,
+                'error_message': str(e)
+            }
+
+    def get_collecting_stocks(self) -> Dict[str, Any]:
+        """
+        현재 수집 중인 종목 목록 조회
+
+        Returns:
+            dict: 수집 중인 종목 정보
+        """
+        if not self.tick_collector:
+            return {
+                'status': 'not_initialized',
+                'stocks': [],
+                'stock_count': 0
+            }
+
+        try:
+            stock_codes = self.tick_collector.stock_codes or []
+            stock_info = self.tick_collector.stock_info or {}
+
+            # 종목 정보 구성
+            stocks_with_names = []
+            if stock_codes:
+                for code in stock_codes:
+                    stocks_with_names.append({
+                        'stock_code': code,
+                        'stock_name': stock_info.get(code, '-')
+                    })
+
+            return {
+                'status': 'success',
+                'stocks': stocks_with_names,
+                'stock_count': len(stock_codes),
+                'collection_mode': self.tick_collector.collection_mode
+            }
+        except Exception as e:
+            logger.error(f"수집 종목 조회 실패: {e}")
+            return {
+                'status': 'error',
+                'stocks': [],
+                'stock_count': 0,
                 'error_message': str(e)
             }
 

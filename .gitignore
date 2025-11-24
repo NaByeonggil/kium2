@@ -49,3 +49,18 @@ htmlcov/
 tmp/
 temp/
 *.tmp
+
+# Screenshots and images
+*.png
+*.jpg
+*.jpeg
+*.gif
+
+# Debug documents
+WebSocket_*.md
+
+# External reference documents
+*.pdf
+*.xlsx
+영웅문4*.pdf
+영웅문4*.xlsx

@@ -114,15 +114,86 @@ class SubServer:
                     "207940",  # 삼성바이오로직스
                     "005490",  # POSCO홀딩스
                 ]
+                stock_info = {
+                    "005930": "삼성전자",
+                    "000660": "SK하이닉스",
+                    "035420": "NAVER",
+                    "005380": "현대차",
+                    "051910": "LG화학",
+                    "006400": "삼성SDI",
+                    "035720": "카카오",
+                    "068270": "셀트리온",
+                    "207940": "삼성바이오로직스",
+                    "005490": "POSCO홀딩스"
+                }
             else:
                 stock_codes = [stock['stock_code'] for stock in top_stocks]
+                stock_info = {stock['stock_code']: stock['stock_name'] for stock in top_stocks}
+
+            # 2. 커스텀 종목 추가 (.env 파일)
+            custom_codes_str = os.getenv('CUSTOM_STOCK_CODES', '').strip()
+            if custom_codes_str:
+                custom_codes = [code.strip() for code in custom_codes_str.split(',') if code.strip()]
+                if custom_codes:
+                    logger.info(f"📌 .env 커스텀 종목 추가: {len(custom_codes)}개")
+
+                    # 중복 제거하면서 추가
+                    for code in custom_codes:
+                        if code not in stock_codes:
+                            stock_codes.append(code)
+                            # 종목명 자동 조회
+                            try:
+                                result = self.api_client.get_current_price(code)
+                                if result.get('return_code') == 0:
+                                    stock_name = result.get('stk_nm', code)
+                                    stock_info[code] = stock_name
+                                    logger.info(f"  ✓ {code} ({stock_name})")
+                                else:
+                                    stock_info[code] = code
+                                    logger.warning(f"  ⚠️ {code} 종목명 조회 실패")
+                            except Exception as e:
+                                stock_info[code] = code
+                                logger.warning(f"  ⚠️ {code} 종목 정보 조회 오류: {e}")
+                        else:
+                            logger.info(f"  ⊙ {code} 이미 포함됨 (중복 제거)")
+
+            # 3. Redis에 저장된 커스텀 종목 불러오기
+            try:
+                from sub_server.services.redis_service import RedisService
+                redis = RedisService()
+                if redis.is_connected():
+                    redis_custom_stocks = redis.get_custom_stocks()
+                    if redis_custom_stocks:
+                        logger.info(f"📌 Redis 커스텀 종목 불러오기: {len(redis_custom_stocks)}개")
+                        for code, name in redis_custom_stocks.items():
+                            if code not in stock_codes:
+                                stock_codes.append(code)
+                                stock_info[code] = name
+                                logger.info(f"  ✓ {code} ({name})")
+                            else:
+                                logger.debug(f"  ⊙ {code} 이미 포함됨 (중복 제거)")
+                    redis.close()
+            except Exception as e:
+                logger.warning(f"⚠️ Redis 커스텀 종목 불러오기 실패: {e}")
 
             logger.info(f"✅ 수집 대상: {len(stock_codes)}개 종목\n")
 
-            # 2. 틱데이터 수집 시작
-            self.tick_collector.start(stock_codes)
+            # 2. 종목 마스터 정보 저장
+            from sub_server.services.storage_service import TickStorageService
+            storage = TickStorageService()
+            try:
+                for code, name in stock_info.items():
+                    storage.insert_stock_master(code, name, "KRX")
+                logger.info(f"✅ 종목 마스터 정보 저장 완료: {len(stock_info)}개")
+            except Exception as e:
+                logger.warning(f"⚠️ 종목 마스터 저장 실패: {e}")
+            finally:
+                storage.close()
 
-            # 3. 메인 루프
+            # 3. 틱데이터 수집 시작
+            self.tick_collector.start(stock_codes, stock_info)
+
+            # 4. 메인 루프
             logger.info("=" * 60)
             logger.info("✅ Sub Server 가동 중...")
             logger.info("Ctrl+C로 종료")

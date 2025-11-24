@@ -1,0 +1,72 @@
+{
+  "dashboard": {
+    "title": "Sub Server - 실시간 모니터링",
+    "tags": ["kium2", "sub-server", "tick-data"],
+    "timezone": "Asia/Seoul",
+    "panels": [
+      {
+        "id": 1,
+        "title": "틱데이터 수집 속도 (건/초)",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(tick_count_total[1m])",
+            "legendFormat": "수집 속도"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0}
+      },
+      {
+        "id": 2,
+        "title": "총 수집된 틱데이터",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "tick_count_total",
+            "legendFormat": "총 틱데이터"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0}
+      },
+      {
+        "id": 3,
+        "title": "활성 종목 수",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "active_stock_count",
+            "legendFormat": "활성 종목"
+          }
+        ],
+        "gridPos": {"h": 4, "w": 6, "x": 0, "y": 8}
+      },
+      {
+        "id": 4,
+        "title": "버퍼 크기",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "buffer_size",
+            "legendFormat": "버퍼 크기"
+          }
+        ],
+        "gridPos": {"h": 4, "w": 6, "x": 6, "y": 8}
+      },
+      {
+        "id": 5,
+        "title": "메모리 사용량",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "process_resident_memory_bytes",
+            "legendFormat": "메모리 사용량"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8}
+      }
+    ],
+    "refresh": "5s",
+    "schemaVersion": 16,
+    "version": 1
+  }
+}

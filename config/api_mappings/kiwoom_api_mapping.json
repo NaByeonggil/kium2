@@ -1,0 +1,1169 @@
+{
+  "metadata": {
+    "title": "키움증권 API 매핑 정보",
+    "description": "영웅문4 화면번호와 키움 REST API, OPEN API+ TR 매핑",
+    "version": "1.0.0",
+    "updated": "2025-11-06",
+    "source": "https://openapi.kiwoom.com/"
+  },
+  "categories": {
+    "account": "계좌 관련",
+    "quote": "시세 조회",
+    "order": "주문",
+    "trade_history": "거래 내역",
+    "stock_info": "종목 정보",
+    "sector": "업종/테마",
+    "elw": "ELW",
+    "etf": "ETF",
+    "program_trading": "프로그램매매",
+    "investor": "투자자동향",
+    "chart": "차트",
+    "ranking": "순위",
+    "gold": "금현물"
+  },
+  "apis": [
+    {
+      "screen_no": "0361",
+      "screen_name": "실시간계좌관리(T)-예수금",
+      "rest_api": "kt00001",
+      "rest_api_name": "예수금상세현황요청",
+      "open_api": "OPW00001",
+      "open_api_name": "예수금상세현황요청",
+      "category": "account"
+    },
+    {
+      "screen_no": "0362",
+      "screen_name": "예수금상세현황",
+      "rest_api": "kt00001",
+      "rest_api_name": "예수금상세현황요청",
+      "open_api": "OPW00001",
+      "open_api_name": "예수금상세현황요청",
+      "category": "account"
+    },
+    {
+      "screen_no": "0120",
+      "screen_name": "미니주식체결",
+      "rest_api": "ka10003",
+      "rest_api_name": "체결정보요청",
+      "open_api": "OPT10003",
+      "open_api_name": "체결정보요청",
+      "category": "quote"
+    },
+    {
+      "screen_no": "0122",
+      "screen_name": "당일전일체결",
+      "rest_api": ["ka10055", "ka10084"],
+      "rest_api_name": ["당일전일체결량요청", "당일전일체결요청"],
+      "open_api": ["OPT10055", "OPT10084"],
+      "open_api_name": ["당일전일체결대량요청", "당일전일체결요청"],
+      "category": "quote"
+    },
+    {
+      "screen_no": "0124",
+      "screen_name": "일별주가",
+      "rest_api": "ka10086",
+      "rest_api_name": "일별주가요청",
+      "open_api": "OPT10086",
+      "open_api_name": "일별주가요청",
+      "category": "quote"
+    },
+    {
+      "screen_no": "0125",
+      "screen_name": "시간대별 전일비거래비중",
+      "rest_api": null,
+      "rest_api_name": null,
+      "open_api": "OPT10071",
+      "open_api_name": "시간대별전일비거래비중요청",
+      "category": "quote"
+    },
+    {
+      "screen_no": "0126",
+      "screen_name": "미니거래원변동",
+      "rest_api": "ka10040",
+      "rest_api_name": "당일주요거래원요청",
+      "open_api": "OPT10040",
+      "open_api_name": "당일주요거래원",
+      "category": "stock_info"
+    },
+    {
+      "screen_no": "0129",
+      "screen_name": "미니거래원",
+      "rest_api": null,
+      "rest_api_name": null,
+      "open_api": "OPT10070",
+      "open_api_name": "당일주요거래원요청",
+      "category": "stock_info"
+    },
+    {
+      "screen_no": "0254",
+      "screen_name": "당일주요거래원",
+      "rest_api": "ka10040",
+      "rest_api_name": "당일주요거래원요청",
+      "open_api": null,
+      "open_api_name": null,
+      "category": "stock_info"
+    },
+    {
+      "screen_no": "0141",
+      "screen_name": "종목별 신용매매동향",
+      "rest_api": "ka10013",
+      "rest_api_name": "신용매매동향요청",
+      "open_api": "OPT10013",
+      "open_api_name": "신용매매동향요청",
+      "category": "stock_info"
+    },
+    {
+      "screen_no": "0142",
+      "screen_name": "종목별 공매도추이",
+      "rest_api": "ka10014",
+      "rest_api_name": "공매도추이요청",
+      "open_api": "OPT10014",
+      "open_api_name": "공매도추이요청",
+      "category": "stock_info"
+    },
+    {
+      "screen_no": "0143",
+      "screen_name": "일별거래상세",
+      "rest_api": "ka10015",
+      "rest_api_name": "일별거래상세요청",
+      "open_api": "OPT10015",
+      "open_api_name": "일별거래상세요청",
+      "category": "stock_info"
+    },
+    {
+      "screen_no": "0161",
+      "screen_name": "신고가_신저가",
+      "rest_api": "ka10016",
+      "rest_api_name": "신고저가요청",
+      "open_api": "OPT10016",
+      "open_api_name": "신고저가요청",
+      "category": "ranking"
+    },
+    {
+      "screen_no": "0162",
+      "screen_name": "상한가하한가",
+      "rest_api": "ka10017",
+      "rest_api_name": "상하한가요청",
+      "open_api": "OPT10017",
+      "open_api_name": "상하한가요청",
+      "category": "ranking"
+    },
+    {
+      "screen_no": "0163",
+      "screen_name": "고가_저가근접",
+      "rest_api": "ka10018",
+      "rest_api_name": "고저가근접요청",
+      "open_api": "OPT10018",
+      "open_api_name": "고저가근접요청",
+      "category": "ranking"
+    },
+    {
+      "screen_no": "0164",
+      "screen_name": "가격급등_급락",
+      "rest_api": "ka10019",
+      "rest_api_name": "가격급등락요청",
+      "open_api": "OPT10019",
+      "open_api_name": "가격급등락요청",
+      "category": "ranking"
+    },
+    {
+      "screen_no": "0165",
+      "screen_name": "호가잔량상위",
+      "rest_api": "ka10020",
+      "rest_api_name": "호가잔량상위요청",
+      "open_api": "OPT10020",
+      "open_api_name": "호가잔량상위요청",
+      "category": "ranking"
+    },
+    {
+      "screen_no": "0166",
+      "screen_name": "호가잔량급증",
+      "rest_api": "ka10020",
+      "rest_api_name": "호가잔량상위요청",
+      "open_api": "OPT10020",
+      "open_api_name": "호가잔량상위요청",
+      "category": "ranking"
+    },
+    {
+      "screen_no": "0167",
+      "screen_name": "잔량급증율",
+      "rest_api": "ka10022",
+      "rest_api_name": "잔량율급증요청",
+      "open_api": "OPT10022",
+      "open_api_name": "잔량율급증요청",
+      "category": "ranking"
+    },
+    {
+      "screen_no": "0168",
+      "screen_name": "거래량급증",
+      "rest_api": "ka10023",
+      "rest_api_name": "거래량급증요청",
+      "open_api": "OPT10023",
+      "open_api_name": "거래량급증요청",
+      "category": "ranking"
+    },
+    {
+      "screen_no": "0169",
+      "screen_name": "거래량갱신",
+      "rest_api": "ka10024",
+      "rest_api_name": "거래량갱신요청",
+      "open_api": "OPT10024",
+      "open_api_name": "거래량갱신요청",
+      "category": "ranking"
+    },
+    {
+      "screen_no": "0170",
+      "screen_name": "매물대집중",
+      "rest_api": "ka10025",
+      "rest_api_name": "매물대집중요청",
+      "open_api": "OPT10025",
+      "open_api_name": "매물대집중요청",
+      "category": "ranking"
+    },
+    {
+      "screen_no": "0171",
+      "screen_name": "고PER_저PER",
+      "rest_api": "ka10026",
+      "rest_api_name": "고저PER요청",
+      "open_api": "OPT10026",
+      "open_api_name": "고저PER요청",
+      "category": "ranking"
+    },
+    {
+      "screen_no": "0181",
+      "screen_name": "전일대비등락률상위",
+      "rest_api": "ka10027",
+      "rest_api_name": "전일대비등락률상위요청",
+      "open_api": "OPT10027",
+      "open_api_name": "전일대비등락률상위요청",
+      "category": "ranking"
+    },
+    {
+      "screen_no": "0182",
+      "screen_name": "시가대비등락률상위",
+      "rest_api": "ka10028",
+      "rest_api_name": "시가대비등락률요청",
+      "open_api": "OPT10028",
+      "open_api_name": "시가대비등락률요청",
+      "category": "ranking"
+    },
+    {
+      "screen_no": "0183",
+      "screen_name": "예상체결등락률상위",
+      "rest_api": "ka10029",
+      "rest_api_name": "예상체결등락률상위요청",
+      "open_api": "OPT10029",
+      "open_api_name": "예상체결등락률상위요청",
+      "category": "ranking"
+    },
+    {
+      "screen_no": "0184",
+      "screen_name": "당일거래량상위",
+      "rest_api": "ka10030",
+      "rest_api_name": "당일거래량상위요청",
+      "open_api": "OPT10030",
+      "open_api_name": "당일거래량상위요청",
+      "category": "ranking"
+    },
+    {
+      "screen_no": "0185",
+      "screen_name": "전일거래량상위",
+      "rest_api": "ka10031",
+      "rest_api_name": "전일거래량상위요청",
+      "open_api": "OPT10031",
+      "open_api_name": "전일거래량상위요청",
+      "category": "ranking"
+    },
+    {
+      "screen_no": "0186",
+      "screen_name": "거래대금상위",
+      "rest_api": "ka10032",
+      "rest_api_name": "거래대금상위요청",
+      "open_api": "OPT10032",
+      "open_api_name": "거래대금상위요청",
+      "category": "ranking"
+    },
+    {
+      "screen_no": "0188",
+      "screen_name": "신용비율상위",
+      "rest_api": "ka10033",
+      "rest_api_name": "신용비율상위요청",
+      "open_api": "OPT10033",
+      "open_api_name": "신용비율상위요청",
+      "category": "ranking"
+    },
+    {
+      "screen_no": "0198",
+      "screen_name": "실시간 종목 조회 순위",
+      "rest_api": "ka00198",
+      "rest_api_name": "실시간종목조회순위",
+      "open_api": null,
+      "open_api_name": null,
+      "category": "ranking"
+    },
+    {
+      "screen_no": "0213",
+      "screen_name": "업종별주가",
+      "rest_api": ["ka20001", "ka20002"],
+      "rest_api_name": ["업종현재가요청", "업종별주가요청"],
+      "open_api": ["OPT20001", "OPT20002"],
+      "open_api_name": ["업종현재가요청", "업종별주가요청"],
+      "category": "sector"
+    },
+    {
+      "screen_no": "0211",
+      "screen_name": "업종현재가",
+      "rest_api": ["ka20001", "ka20002"],
+      "rest_api_name": ["업종현재가요청", "업종별주가요청"],
+      "open_api": ["OPT20001", "OPT20002"],
+      "open_api_name": ["업종현재가요청", "업종별주가요청"],
+      "category": "sector"
+    },
+    {
+      "screen_no": "0214",
+      "screen_name": "업종시세 - 전업종지수",
+      "rest_api": "ka20003",
+      "rest_api_name": "전업종지수요청",
+      "open_api": "OPT20003",
+      "open_api_name": "전업종지수요청",
+      "category": "sector"
+    },
+    {
+      "screen_no": "0240",
+      "screen_name": "외국인정보 - 종목별매매동향",
+      "rest_api": "ka10008",
+      "rest_api_name": "주식외국인종목별매매동향",
+      "open_api": "OPT10008",
+      "open_api_name": "주식외국인요청",
+      "category": "investor"
+    },
+    {
+      "screen_no": "0242",
+      "screen_name": "기간별매매상위",
+      "rest_api": "ka10034",
+      "rest_api_name": "외인기간별매매상위요청",
+      "open_api": "OPT10034",
+      "open_api_name": "외인기간별매매상위요청",
+      "category": "investor"
+    },
+    {
+      "screen_no": "0243",
+      "screen_name": "연속순매매상위",
+      "rest_api": "ka10035",
+      "rest_api_name": "외인연속순매매상위요청",
+      "open_api": "OPT10035",
+      "open_api_name": "외인연속순매매상위요청",
+      "category": "investor"
+    },
+    {
+      "screen_no": "0244",
+      "screen_name": "한도소진율증가상위",
+      "rest_api": "ka10036",
+      "rest_api_name": "외인한도소진율증가상위",
+      "open_api": "OPT10036",
+      "open_api_name": "매매상위요청",
+      "category": "investor"
+    },
+    {
+      "screen_no": "0246",
+      "screen_name": "매매상위",
+      "rest_api": "ka10037",
+      "rest_api_name": "외국계창구매매상위요청",
+      "open_api": "OPT10037",
+      "open_api_name": "외국계창구매매상위요청",
+      "category": "investor"
+    },
+    {
+      "screen_no": "0248",
+      "screen_name": "미니외국계창구매매상위",
+      "rest_api": "ka10037",
+      "rest_api_name": "외국계창구매매상위요청",
+      "open_api": "OPT10037",
+      "open_api_name": "외국계창구매매상위요청",
+      "category": "investor"
+    },
+    {
+      "screen_no": "0250",
+      "screen_name": "증권사별 매매동향 - 종목매매동향",
+      "rest_api": "ka10078",
+      "rest_api_name": "증권사별종목매매동향요청",
+      "open_api": ["OPT10041", "OPT10078"],
+      "open_api_name": ["조기종료통화단위요청", "증권사별종목매매동향요청"],
+      "category": "investor"
+    },
+    {
+      "screen_no": "0251",
+      "screen_name": "증권사별 매매동향 - 종목별증권사순위",
+      "rest_api": "ka10038",
+      "rest_api_name": "종목별증권사순위요청",
+      "open_api": "OPT10038",
+      "open_api_name": "종목별증권사순위요청",
+      "category": "investor"
+    },
+    {
+      "screen_no": "0252",
+      "screen_name": "증권사별 매매동향(증권사별매매상위)",
+      "rest_api": "ka10039",
+      "rest_api_name": "증권사별매매상위요청",
+      "open_api": "OPT10039",
+      "open_api_name": "증권사별매매상위요청",
+      "category": "investor"
+    },
+    {
+      "screen_no": "0256",
+      "screen_name": "증권사별 매매동향(거래원매물대분석)",
+      "rest_api": ["ka10042", "ka10043"],
+      "rest_api_name": ["순매수거래원순위요청", "거래원매물대분석요청"],
+      "open_api": "OPT10042",
+      "open_api_name": "순매수거래원순위요청",
+      "category": "investor"
+    },
+    {
+      "screen_no": "0257",
+      "screen_name": "일별_기관매매종목",
+      "rest_api": "ka10044",
+      "rest_api_name": "일별기관매매종목요청",
+      "open_api": "OPT10044",
+      "open_api_name": "일별기관매매종목요청",
+      "category": "investor"
+    },
+    {
+      "screen_no": "0258",
+      "screen_name": "종목별_기관매매추이",
+      "rest_api": "ka10045",
+      "rest_api_name": "종목별기관매매추이요청",
+      "open_api": "OPT10045",
+      "open_api_name": "종목별기관매매추이요청",
+      "category": "investor"
+    },
+    {
+      "screen_no": "0272",
+      "screen_name": "ELW가격급등-급락",
+      "rest_api": "ka30001",
+      "rest_api_name": "ELW가격급등락요청",
+      "open_api": "OPT30001",
+      "open_api_name": "ELW가격급등락요청",
+      "category": "elw"
+    },
+    {
+      "screen_no": "0273",
+      "screen_name": "거래원별ELW순매매상위",
+      "rest_api": "ka30002",
+      "rest_api_name": "거래원별ELW순매매상위요청",
+      "open_api": "OPT30002",
+      "open_api_name": "거래원별ELW순매매상위요청",
+      "category": "elw"
+    },
+    {
+      "screen_no": "0275",
+      "screen_name": "ETF현재가",
+      "rest_api": ["ka40001", "ka40007", "ka40009"],
+      "rest_api_name": ["ETF수익율요청", "ETF시간대별체결요청", "ETF시간대별체결요청"],
+      "open_api": ["OPT40001", "OPT40007", "OPT40008", "OPTKWFID"],
+      "open_api_name": ["ETF수익율요청", "ETF시간대별체결요청", "ETF시간대별체결요청", "관심종목정보요청"],
+      "category": "etf"
+    },
+    {
+      "screen_no": "0277",
+      "screen_name": "ETF일별추이",
+      "rest_api": ["ka40002", "ka40003"],
+      "rest_api_name": ["ETF종목정보요청", "ETF일별추이요청"],
+      "open_api": ["OPT40002", "OPT40003"],
+      "open_api_name": ["ETF종목정보요청", "ETF일별추이요청"],
+      "category": "etf"
+    },
+    {
+      "screen_no": "0278",
+      "screen_name": "ETF전체시세",
+      "rest_api": "ka40004",
+      "rest_api_name": "ETF전체시세요청",
+      "open_api": "OPT40004",
+      "open_api_name": "ETF전체시세요청",
+      "category": "etf"
+    },
+    {
+      "screen_no": "0279",
+      "screen_name": "ETF시간대별추이",
+      "rest_api": "ka40003",
+      "rest_api_name": "ETF일별추이요청",
+      "open_api": "OPT40005",
+      "open_api_name": "ETF일별추이요청",
+      "category": "etf"
+    },
+    {
+      "screen_no": "0285",
+      "screen_name": "ELW LP보유일별추이",
+      "rest_api": "ka30003",
+      "rest_api_name": "ELWLP보유일별추이요청",
+      "open_api": "OPT30003",
+      "open_api_name": "ELWLP보유일별추이요청",
+      "category": "elw"
+    },
+    {
+      "screen_no": "0286",
+      "screen_name": "ELW일별민감도지표",
+      "rest_api": ["ka10001", "ka10048"],
+      "rest_api_name": ["주식기본정보요청", "ELW일별민감도지표요청"],
+      "open_api": ["OPT10001", "OPT10048"],
+      "open_api_name": ["주식기본정보요청", "ELW일별민감도지표요청"],
+      "category": "elw"
+    },
+    {
+      "screen_no": "0287",
+      "screen_name": "ELW괴리율",
+      "rest_api": "ka30004",
+      "rest_api_name": "ELW괴리율요청",
+      "open_api": "OPT30004",
+      "open_api_name": "ELW괴리율요청",
+      "category": "elw"
+    },
+    {
+      "screen_no": "0289",
+      "screen_name": "ELW조건검색",
+      "rest_api": "ka30005",
+      "rest_api_name": "ELW조건검색요청",
+      "open_api": "OPT30005",
+      "open_api_name": "ELW조건검색요청",
+      "category": "elw"
+    },
+    {
+      "screen_no": "0290",
+      "screen_name": "ELW현재가",
+      "rest_api": ["ka10081", "ka30012", "ka30011"],
+      "rest_api_name": ["주식일봉차트조회요청", "ELW종목상세정보요청", "ELW근접율요청"],
+      "open_api": ["OPT10081", "OPT30007", "OPT30011"],
+      "open_api_name": ["주식일봉차트조회요청", "ELW종목상세요청", "ELW근접율요청"],
+      "category": "elw"
+    },
+    {
+      "screen_no": "0291",
+      "screen_name": "ELW종목상세정보",
+      "rest_api": ["ka10001", "ka30012"],
+      "rest_api_name": ["주식기본정보요청", "ELW종목상세정보요청"],
+      "open_api": ["OPT10001", "OPT30012"],
+      "open_api_name": ["주식기본정보요청", "ELW종목정보상세요청"],
+      "category": "elw"
+    },
+    {
+      "screen_no": "0292",
+      "screen_name": "ELW투자지표",
+      "rest_api": "ka10001",
+      "rest_api_name": "주식기본정보요청",
+      "open_api": "OPT10001",
+      "open_api_name": "주식기본정보요청",
+      "category": "elw"
+    },
+    {
+      "screen_no": "0293",
+      "screen_name": "ELW등락률순위",
+      "rest_api": "ka30009",
+      "rest_api_name": "ELW등락율순위요청",
+      "open_api": "OPT30009",
+      "open_api_name": "ELW등락율순위요청",
+      "category": "elw"
+    },
+    {
+      "screen_no": "0294",
+      "screen_name": "ELW잔량순위",
+      "rest_api": "ka30010",
+      "rest_api_name": "ELW잔량순위요청",
+      "open_api": "OPT30010",
+      "open_api_name": "ELW잔량순위요청",
+      "category": "elw"
+    },
+    {
+      "screen_no": "0295",
+      "screen_name": "ELW거래량순위",
+      "rest_api": ["ka10001", "ka10050"],
+      "rest_api_name": ["주식기본정보요청", "ELW민감도지표요청"],
+      "open_api": ["OPT10001", "OPT30008"],
+      "open_api_name": ["주식기본정보요청", "ELW민감도지표요청"],
+      "category": "elw"
+    },
+    {
+      "screen_no": "0296",
+      "screen_name": "ELW시세현황",
+      "rest_api": "ka30012",
+      "rest_api_name": "ELW종목상세정보요청",
+      "open_api": "OPT30007",
+      "open_api_name": "ELW종목상세요청",
+      "category": "elw"
+    },
+    {
+      "screen_no": "0299",
+      "screen_name": "ELW민감도지표",
+      "rest_api": "ka10050",
+      "rest_api_name": "ELW민감도지표요청",
+      "open_api": ["OPT30008", "OPT10050"],
+      "open_api_name": ["ELW민감도지표요청", "ELW민감도지표요청"],
+      "category": "elw"
+    },
+    {
+      "screen_no": "0328",
+      "screen_name": "일자별 종목별 실현손익",
+      "rest_api": ["ka10072", "ka10073"],
+      "rest_api_name": ["일자별종목별실현손익요청_일자", "일자별종목별실현손익요청_기간"],
+      "open_api": ["OPT10072", "OPT10073"],
+      "open_api_name": ["일자별종목별실현손익요청", "일자별종목별실현손익요청"],
+      "category": "account"
+    },
+    {
+      "screen_no": "0329",
+      "screen_name": "일자별실현손익",
+      "rest_api": "ka10074",
+      "rest_api_name": "일자별실현손익요청",
+      "open_api": "OPT10074",
+      "open_api_name": "일자별실현손익요청",
+      "category": "account"
+    },
+    {
+      "screen_no": "0341",
+      "screen_name": "실시간계좌관리 - 실시간 미체결",
+      "rest_api": "ka10075",
+      "rest_api_name": "미체결요청",
+      "open_api": "OPT10075",
+      "open_api_name": "실시간미체결요청",
+      "category": "trade_history"
+    },
+    {
+      "screen_no": "0350",
+      "screen_name": "체결확인(당일)",
+      "rest_api": "ka10076",
+      "rest_api_name": "체결요청",
+      "open_api": "OPT10076",
+      "open_api_name": "실시간체결요청",
+      "category": "trade_history"
+    },
+    {
+      "screen_no": "0355",
+      "screen_name": "실현손익 - 당일실현손익상세",
+      "rest_api": "ka10077",
+      "rest_api_name": "당일실현손익상세요청",
+      "open_api": "OPT10077",
+      "open_api_name": "당일실현손익상세요청",
+      "category": "account"
+    },
+    {
+      "screen_no": "0612",
+      "screen_name": "미니TICK차트",
+      "rest_api": "ka10079",
+      "rest_api_name": "주식틱차트조회요청",
+      "open_api": "OPT10079",
+      "open_api_name": "주식틱차트조회요청",
+      "category": "chart"
+    },
+    {
+      "screen_no": "6600",
+      "screen_name": "통합키움차트",
+      "rest_api": ["ka10081", "ka10082", "ka10083"],
+      "rest_api_name": ["주식일봉차트조회요청", "주식주봉차트조회요청", "주식월봉차트조회요청"],
+      "open_api": ["OPT10081", "OPT10082", "OPT10083"],
+      "open_api_name": ["주식일봉차트조회요청", "주식주봉차트조회요청", "주식월봉차트조회요청"],
+      "category": "chart"
+    },
+    {
+      "screen_no": "0613",
+      "screen_name": "주식일주월차트",
+      "rest_api": ["ka10081", "ka10082", "ka10083"],
+      "rest_api_name": ["주식일봉차트조회요청", "주식주봉차트조회요청", "주식월봉차트조회요청"],
+      "open_api": ["OPT10081", "OPT10082", "OPT10083"],
+      "open_api_name": ["주식일봉차트조회요청", "주식주봉차트조회요청", "주식월봉차트조회요청"],
+      "category": "chart"
+    },
+    {
+      "screen_no": "0615",
+      "screen_name": "키움미니차트",
+      "rest_api": ["ka10079", "ka10080", "ka10081", "ka10082", "ka10083"],
+      "rest_api_name": ["주식틱차트조회요청", "주식분봉차트조회요청", "주식일봉차트조회요청", "주식주봉차트조회요청", "주식월봉차트조회요청"],
+      "open_api": ["OPT10079", "OPT10080", "OPT10081", "OPT10082", "OPT10083"],
+      "open_api_name": ["주식틱차트조회요청", "주식분봉차트조회요청", "주식일봉차트조회요청", "주식주봉차트조회요청", "주식월봉차트조회요청"],
+      "category": "chart"
+    },
+    {
+      "screen_no": "0617",
+      "screen_name": "미니모아차트",
+      "rest_api": ["ka10079", "ka10080", "ka10081"],
+      "rest_api_name": ["주식틱차트조회요청", "주식분봉차트조회요청", "주식일봉차트조회요청"],
+      "open_api": ["OPT10079", "OPT10080", "OPT10081"],
+      "open_api_name": ["주식틱차트조회요청", "주식분봉차트조회요청", "주식일봉차트조회요청"],
+      "category": "chart"
+    },
+    {
+      "screen_no": "0650",
+      "screen_name": "테마종목(테마그룹별)",
+      "rest_api": "ka90001",
+      "rest_api_name": "테마그룹별요청",
+      "open_api": "OPT90001",
+      "open_api_name": "테마그룹별요청",
+      "category": "sector"
+    },
+    {
+      "screen_no": "0651",
+      "screen_name": "테마종목_테마구성종목",
+      "rest_api": "ka90002",
+      "rest_api_name": "테마구성종목요청",
+      "open_api": "OPT90002",
+      "open_api_name": "테마구성종목요청",
+      "category": "sector"
+    },
+    {
+      "screen_no": "0766",
+      "screen_name": "프로그램매매 - 프로그램순매수상위50",
+      "rest_api": "ka90003",
+      "rest_api_name": "프로그램순매수상위50요청",
+      "open_api": "OPT90003",
+      "open_api_name": "프로그램순매수상위50요청",
+      "category": "program_trading"
+    },
+    {
+      "screen_no": "0767",
+      "screen_name": "프로그램매매 - 종목별프로그램매매현황",
+      "rest_api": "ka90004",
+      "rest_api_name": "종목별프로그램매매현황요청",
+      "open_api": "OPT90004",
+      "open_api_name": "종목별프로그램매매현황요청",
+      "category": "program_trading"
+    },
+    {
+      "screen_no": "0768",
+      "screen_name": "프로그램매매 - 프로그램매매추이",
+      "rest_api": "ka90005",
+      "rest_api_name": "프로그램매매추이요청 시간대별",
+      "open_api": "OPT90005",
+      "open_api_name": "프로그램매매추이요청",
+      "category": "program_trading"
+    },
+    {
+      "screen_no": "0773",
+      "screen_name": "차익잔고추이",
+      "rest_api": "ka90006",
+      "rest_api_name": "프로그램매매차익잔고추이요청",
+      "open_api": "OPT90006",
+      "open_api_name": "프로그램매매차익잔고추이요청",
+      "category": "program_trading"
+    },
+    {
+      "screen_no": "0774",
+      "screen_name": "차익잔고현황",
+      "rest_api": null,
+      "rest_api_name": null,
+      "open_api": "OPT90010",
+      "open_api_name": "차익잔고현황요청",
+      "category": "program_trading"
+    },
+    {
+      "screen_no": "0777",
+      "screen_name": "프로그램매매누적추이",
+      "rest_api": "ka90007",
+      "rest_api_name": "프로그램매매누적추이요청",
+      "open_api": "OPT90007",
+      "open_api_name": "프로그램매매누적추이요청",
+      "category": "program_trading"
+    },
+    {
+      "screen_no": "0778",
+      "screen_name": "종목일별 프로그램매매추이",
+      "rest_api": null,
+      "rest_api_name": null,
+      "open_api": "OPT90008",
+      "open_api_name": "종목일별프로그램매매추이요청",
+      "category": "program_trading"
+    },
+    {
+      "screen_no": "0785",
+      "screen_name": "외국인기관매매상위",
+      "rest_api": "ka90009",
+      "rest_api_name": "외국인기관매매상위요청",
+      "open_api": "OPT90009",
+      "open_api_name": "외국인기관매매상위요청",
+      "category": "investor"
+    },
+    {
+      "screen_no": "0795",
+      "screen_name": "투자자별일별매매종목",
+      "rest_api": "ka10058",
+      "rest_api_name": "투자자별일별매매종목요청",
+      "open_api": "OPT10058",
+      "open_api_name": "투자자별일별매매종목요청",
+      "category": "investor"
+    },
+    {
+      "screen_no": "0796",
+      "screen_name": "종목별투자자",
+      "rest_api": ["ka10059", "ka10060", "ka10061"],
+      "rest_api_name": ["종목별투자자기관별요청", "종목별투자자기관별차트요청", "종목별투자자기관별합계요청"],
+      "open_api": ["OPT10059", "OPT10060", "OPT10061"],
+      "open_api_name": ["종목별투자자기관별요청", "종목별투자자기관별차트요청", "종목별투자자기관별합계요청"],
+      "category": "investor"
+    },
+    {
+      "screen_no": "0797",
+      "screen_name": "업종별투자자별순매수",
+      "rest_api": "ka10051",
+      "rest_api_name": "업종별투자자순매수요청",
+      "open_api": "OPT10051",
+      "open_api_name": "업종별투자자순매수요청",
+      "category": "investor"
+    },
+    {
+      "screen_no": "0798",
+      "screen_name": "기관_외국인 동일순매매순위",
+      "rest_api": "ka10062",
+      "rest_api_name": "동일순매매순위요청",
+      "open_api": "OPT10062",
+      "open_api_name": "동일순매매순위요청",
+      "category": "investor"
+    },
+    {
+      "screen_no": "0799",
+      "screen_name": "종목별 투자자2",
+      "rest_api": "ka10059",
+      "rest_api_name": "종목별투자자기관별요청",
+      "open_api": "OPT10059",
+      "open_api_name": "종목별투자자기관별요청",
+      "category": "investor"
+    },
+    {
+      "screen_no": "1052",
+      "screen_name": "장중투자자별매매종합(잠정)",
+      "rest_api": ["ka10063", "ka10064"],
+      "rest_api_name": ["장중투자자별매매요청", "장중투자자별매매차트요청"],
+      "open_api": ["OPT10041", "OPT10063", "OPT10064"],
+      "open_api_name": ["조기종료통화단위요청", "장중투자자별매매요청", "장중투자자별매매차트요청"],
+      "category": "investor"
+    },
+    {
+      "screen_no": "1053",
+      "screen_name": "장중투자자별매매상위(잠정)",
+      "rest_api": "ka10065",
+      "rest_api_name": "장중투자자별매매상위요청",
+      "open_api": "OPT10065",
+      "open_api_name": "장중투자자별매매상위요청",
+      "category": "investor"
+    },
+    {
+      "screen_no": "1054",
+      "screen_name": "장마감후투자자별매매",
+      "rest_api": "ka10066",
+      "rest_api_name": "장마감후투자자별매매요청",
+      "open_api": "OPT10066",
+      "open_api_name": "장중투자자별매매차트요청",
+      "category": "investor"
+    },
+    {
+      "screen_no": "1060",
+      "screen_name": "대차거래내역",
+      "rest_api": "ka90012",
+      "rest_api_name": "대차거래내역요청",
+      "open_api": "OPT10067",
+      "open_api_name": "대차거래내역요청",
+      "category": "stock_info"
+    },
+    {
+      "screen_no": "1061",
+      "screen_name": "대차거래추이",
+      "rest_api": ["ka10068", "ka20068"],
+      "rest_api_name": ["대차거래추이요청", "대차거래추이요청(종목별)"],
+      "open_api": ["OPT10068", "OPT20068"],
+      "open_api_name": ["대차거래추이요청", "대차거래추이요청(종목별)"],
+      "category": "stock_info"
+    },
+    {
+      "screen_no": "1062",
+      "screen_name": "대차거래상위10종목",
+      "rest_api": "ka10069",
+      "rest_api_name": "대차거래상위10종목요청",
+      "open_api": "OPT10069",
+      "open_api_name": "대차거래상위10종목요청",
+      "category": "stock_info"
+    },
+    {
+      "screen_no": "0349",
+      "screen_name": "일별 추정예탁자산 현황",
+      "rest_api": "kt00002",
+      "rest_api_name": "일별추정예탁자산현황요청",
+      "open_api": "OPW00002",
+      "open_api_name": "일별추정예탁자산현황요청",
+      "category": "account"
+    },
+    {
+      "screen_no": "0345",
+      "screen_name": "실시간잔고",
+      "rest_api": ["kt00003", "ka10085"],
+      "rest_api_name": ["추정자산조회요청", "계좌수익률요청"],
+      "open_api": ["OPW00003", "OPT10085"],
+      "open_api_name": ["추정자산조회요청", "계좌수익률요청"],
+      "category": "account"
+    },
+    {
+      "screen_no": "0346",
+      "screen_name": "실시간계좌관리(T) - 잔고확인",
+      "rest_api": "kt00004",
+      "rest_api_name": "계좌평가현황요청",
+      "open_api": "OPW00004",
+      "open_api_name": "계좌평가현황요청",
+      "category": "account"
+    },
+    {
+      "screen_no": "0391",
+      "screen_name": "계좌평가 잔고내역(합산)",
+      "rest_api": "kt00018",
+      "rest_api_name": "계좌평가잔고내역요청",
+      "open_api": "OPW00018",
+      "open_api_name": "계좌평가잔고내역요청",
+      "category": "account"
+    },
+    {
+      "screen_no": "0309",
+      "screen_name": "실시간잔고-미체결",
+      "rest_api": ["ka10075", "kt00003", "ka10085"],
+      "rest_api_name": ["미체결요청", "추정자산조회요청", "계좌수익률요청"],
+      "open_api": ["OPT10075", "OPW00003", "OPT10085"],
+      "open_api_name": ["실시간미체결요청", "추정자산조회요청", "계좌수익률요청"],
+      "category": "account"
+    },
+    {
+      "screen_no": "0351",
+      "screen_name": "주문체결내역 - 주문체결내역 - 금일주문체결내역",
+      "rest_api": "kt00007",
+      "rest_api_name": "계좌별주문체결내역상세요청",
+      "open_api": "OPW00007",
+      "open_api_name": "계좌별주문체결내역상세요청",
+      "category": "trade_history"
+    },
+    {
+      "screen_no": "0352",
+      "screen_name": "주문체결내역 - 주문체결내역 - 전일체결내역",
+      "rest_api": "kt00008",
+      "rest_api_name": "계좌별익일결제예정내역요청",
+      "open_api": "OPW00008",
+      "open_api_name": "계좌별익일결제예정내역요청",
+      "category": "trade_history"
+    },
+    {
+      "screen_no": "0347",
+      "screen_name": "주문인출 가능금 추정",
+      "rest_api": "kt00010",
+      "rest_api_name": "주문인출가능금액요청",
+      "open_api": "OPW00010",
+      "open_api_name": "주문인출가능금액요청",
+      "category": "order"
+    },
+    {
+      "screen_no": "0399",
+      "screen_name": "주문가능수량(종목별_증거금률별)",
+      "rest_api": ["kt00011", "kt00012"],
+      "rest_api_name": ["증거금율별주문가능수량조회요청", "신용보증금율별주문가능수량조회요청"],
+      "open_api": ["OPW00011", "OPW00012"],
+      "open_api_name": ["증거금율별주문가능수량조회요청", "신용보증금율별주문가능수량조회요청"],
+      "category": "order"
+    },
+    {
+      "screen_no": "0397",
+      "screen_name": "주식증거금상세",
+      "rest_api": "kt00013",
+      "rest_api_name": "증거금세부내역조회요청",
+      "open_api": "OPW00013",
+      "open_api_name": "증거금세부내역조회요청",
+      "category": "order"
+    },
+    {
+      "screen_no": "0353",
+      "screen_name": "실시간계좌관리(T)-당일매매일지",
+      "rest_api": "ka10170",
+      "rest_api_name": "당일매매일지요청",
+      "open_api": ["OPW00014", "OPT10170"],
+      "open_api_name": ["비밀번호일치여부요청", "당일매매일지요청"],
+      "category": "trade_history"
+    },
+    {
+      "screen_no": "0354",
+      "screen_name": "당일매매정리",
+      "rest_api": null,
+      "rest_api_name": null,
+      "open_api": "OPW00014",
+      "open_api_name": "비밀번호일치여부요청",
+      "category": "trade_history"
+    },
+    {
+      "screen_no": "0366",
+      "screen_name": "계좌잔고 상세내역 조회",
+      "rest_api": "kt00004",
+      "rest_api_name": "계좌평가현황요청",
+      "open_api": "OPW00004",
+      "open_api_name": "계좌평가현황요청",
+      "category": "account"
+    },
+    {
+      "screen_no": "0348",
+      "screen_name": "결제예정내역상세",
+      "rest_api": "kt00008",
+      "rest_api_name": "계좌별익일결제예정내역요청",
+      "open_api": "OPW00008",
+      "open_api_name": "계좌별익일결제예정내역요청",
+      "category": "trade_history"
+    },
+    {
+      "screen_no": "0489",
+      "screen_name": "위탁종합계좌거래내역",
+      "rest_api": "kt00015",
+      "rest_api_name": "위탁종합거래내역요청",
+      "open_api": "OPW00015",
+      "open_api_name": "위탁종합거래내역요청",
+      "category": "trade_history"
+    },
+    {
+      "screen_no": "0392",
+      "screen_name": "일별계좌수익률현황",
+      "rest_api": "kt00016",
+      "rest_api_name": "일별계좌수익률상세현황요청",
+      "open_api": "OPW00016",
+      "open_api_name": "일별계좌수익률상세현황요청",
+      "category": "account"
+    },
+    {
+      "screen_no": "0393",
+      "screen_name": "주식수익률현황 - 월별주식수익률현황",
+      "rest_api": "kt00017",
+      "rest_api_name": "계좌별당일현황요청",
+      "open_api": "OPW00017",
+      "open_api_name": "계좌별당일현황요청",
+      "category": "account"
+    },
+    {
+      "screen_no": "0769",
+      "screen_name": "프로그램매매 - 프로그램매매추이차트",
+      "rest_api": null,
+      "rest_api_name": null,
+      "open_api": "OPT50008",
+      "open_api_name": "프로그램매매추이차트요청",
+      "category": "program_trading"
+    },
+    {
+      "screen_no": "0879",
+      "screen_name": "신용융자가능종목",
+      "rest_api": "kt20016",
+      "rest_api_name": "신용융자 가능종목요청",
+      "open_api": "OPW20016",
+      "open_api_name": "신용융자 가능종목요청",
+      "category": "stock_info"
+    },
+    {
+      "screen_no": "0127",
+      "screen_name": "거래원순간거래량",
+      "rest_api": "ka10052",
+      "rest_api_name": "거래원순간거래량요청",
+      "open_api": "OPT10052",
+      "open_api_name": "거래원순간거래량요청",
+      "category": "stock_info"
+    },
+    {
+      "screen_no": "0178",
+      "screen_name": "체결강도추이",
+      "rest_api": "ka10046",
+      "rest_api_name": "체결강도추이시간별요청",
+      "open_api": "OPT10046",
+      "open_api_name": "체결강도추이시간별요청",
+      "category": "stock_info"
+    },
+    {
+      "screen_no": "0298",
+      "screen_name": "신주인수권전체시세",
+      "rest_api": "ka10011",
+      "rest_api_name": "신주인수권전체시세요청",
+      "open_api": "OPT10011",
+      "open_api_name": "신주인수권전체시세요청",
+      "category": "stock_info"
+    },
+    {
+      "screen_no": "0193",
+      "screen_name": "변동성완화장치(VI) 발동종목현황",
+      "rest_api": "ka10054",
+      "rest_api_name": "변동성완화장치발동종목요청",
+      "open_api": "OPT10054",
+      "open_api_name": "변동성완화장치발동종목요청",
+      "category": "stock_info"
+    },
+    {
+      "screen_no": "0763",
+      "screen_name": "기관/외국인연속매매현황 - 기관/외국인연속매매현황",
+      "rest_api": "ka10131",
+      "rest_api_name": "기관외국인연속매매현황요청",
+      "open_api": "OPT10131",
+      "open_api_name": "기관/외국인연속매매현황",
+      "category": "investor"
+    },
+    {
+      "screen_no": "1304",
+      "screen_name": "시간외단일가등락률순위",
+      "rest_api": "ka10098",
+      "rest_api_name": "시간외단일가등락율순위요청",
+      "open_api": "OPT10098",
+      "open_api_name": "시간외단일가등락률순위",
+      "category": "ranking"
+    },
+    {
+      "screen_no": "1690",
+      "screen_name": "자동일지(T) - 일별 잔고 수익률",
+      "rest_api": "ka01690",
+      "rest_api_name": "일별잔고수익률",
+      "open_api": null,
+      "open_api_name": null,
+      "category": "account"
+    },
+    {
+      "screen_no": "0620",
+      "screen_name": "미니업종차트",
+      "rest_api": ["ka20004", "ka20005", "ka20006", "ka20007", "ka20008", "ka20019"],
+      "rest_api_name": ["업종틱차트조회요청", "업종분봉조회요청", "업종일봉조회요청", "업종주봉조회요청", "업종월봉조회요청", "업종년봉조회요청"],
+      "open_api": null,
+      "open_api_name": null,
+      "category": "chart"
+    },
+    {
+      "screen_no": "0619",
+      "screen_name": "금현물차트",
+      "rest_api": ["ka50079", "ka50080", "ka50081", "ka50082", "ka50083"],
+      "rest_api_name": ["금현물틱차트조회요청", "금현물분봉차트조회요청", "금현물일봉차트조회요청", "금현물주봉차트조회요청", "금현물월봉차트조회요청"],
+      "open_api": null,
+      "open_api_name": null,
+      "category": "gold"
+    },
+    {
+      "screen_no": "0202",
+      "screen_name": "금현물주문종합",
+      "rest_api": ["kt50000", "kt50001", "kt50002", "kt50003", "ka50100", "ka50101", "ka52301", "ka50087", "kt50075", "kt50020", "kt50021", "kt50030", "kt50031"],
+      "rest_api_name": ["금현물매수주문", "금현물매도주문", "금현물정정주문", "금현물취소주문", "금현물 시세정보", "금현물 호가", "금현물투자자현황", "금현물예상체결", "금현물 미체결조회", "금현물 잔고확인", "금현물 예수금", "금현물 주문체결전체조회", "금현물 주문체결조회"],
+      "open_api": null,
+      "open_api_name": null,
+      "category": "gold"
+    },
+    {
+      "screen_no": "0209",
+      "screen_name": "금현물일별추이",
+      "rest_api": "ka50012",
+      "rest_api_name": "금현물일별추이",
+      "open_api": null,
+      "open_api_name": null,
+      "category": "gold"
+    },
+    {
+      "screen_no": "0208",
+      "screen_name": "금현물체결추이",
+      "rest_api": "ka50010",
+      "rest_api_name": "금현물체결추이",
+      "open_api": null,
+      "open_api_name": null,
+      "category": "gold"
+    },
+    {
+      "screen_no": "1365",
+      "screen_name": "금현물거래내역",
+      "rest_api": "kt50032",
+      "rest_api_name": "금현물 거래내역조회",
+      "open_api": null,
+      "open_api_name": null,
+      "category": "gold"
+    }
+  ]
+}

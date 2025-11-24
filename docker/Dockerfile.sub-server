@@ -1,0 +1,62 @@
+# ============================================
+# Multi-stage build for Sub Server
+# ============================================
+
+# Stage 1: Builder
+FROM python:3.11-slim as builder
+
+LABEL maintainer="GSLTS Team"
+LABEL description="Sub Server - 24시간 틱데이터 수집 서버"
+
+WORKDIR /app
+
+# 시스템 패키지 설치
+RUN apt-get update && apt-get install -y \
+    gcc \
+    g++ \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Python 패키지 설치
+COPY requirements.txt .
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
+
+# Stage 2: Runtime
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# 시스템 패키지 설치 (런타임 필요)
+RUN apt-get update && apt-get install -y \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Python 패키지 복사
+COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
+COPY --from=builder /usr/local/bin /usr/local/bin
+
+# 애플리케이션 코드 복사
+COPY sub_server/ /app/sub_server/
+COPY config/ /app/config/
+COPY tests/ /app/tests/
+
+# 로그 디렉토리 생성
+RUN mkdir -p /app/logs /app/data
+
+# 작업 디렉토리 설정
+WORKDIR /app
+
+# 환경변수 설정
+ENV PYTHONPATH=/app
+ENV PYTHONUNBUFFERED=1
+
+# 포트 노출
+EXPOSE 8001
+
+# 헬스체크
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD curl -f http://localhost:8001/api/status || exit 1
+
+# 실행 명령
+CMD ["python", "-m", "sub_server.main"]

@@ -350,3 +350,86 @@ class KiwoomAPIClient:
         }
 
         return self._make_request("POST", "/api/dostk/stkinfo", "ka10099", body)
+
+    # ========== 순위/랭킹 정보 ==========
+
+    def get_top_trading_value(
+        self,
+        market_type: str = "0",
+        sort_type: str = "1",
+        target_type: str = "0",
+        limit: int = 50
+    ) -> List[Dict]:
+        """
+        거래대금 상위 종목 조회 (ka10032)
+
+        Args:
+            market_type: 시장구분
+                - "0": 전체
+                - "1": 코스피
+                - "2": 코스닥
+            sort_type: 정렬구분
+                - "1": 거래대금 순
+                - "2": 거래량 순
+            target_type: 대상구분
+                - "0": 전체
+                - "1": 관리종목 제외
+            limit: 조회할 종목 수 (기본: 50)
+
+        Returns:
+            list: 상위 종목 리스트
+                [
+                    {
+                        "stk_cd": "005930",  # 종목코드
+                        "stk_nm": "삼성전자",  # 종목명
+                        "cur_pr": "75000",  # 현재가
+                        "chg_rt": "1.35",  # 등락율
+                        "trde_val": "500000000000",  # 거래대금
+                        "trde_vol": "10000000",  # 거래량
+                    },
+                    ...
+                ]
+        """
+        body = {
+            "mrkt_tp": market_type,
+            "sort_tp": sort_type,
+            "tgt_tp": target_type
+        }
+
+        result = self._make_request("POST", "/api/dostk/rank", "ka10032", body)
+
+        # output에서 상위 N개만 추출
+        if result.get('return_code') == 0:
+            output_list = result.get('output', [])
+            return output_list[:limit]
+        else:
+            logger.warning(f"⚠️ 거래대금 조회 실패: {result.get('return_msg')}")
+            return []
+
+    def get_top_volume_increase(
+        self,
+        market_type: str = "0",
+        limit: int = 50
+    ) -> List[Dict]:
+        """
+        거래량 급증 종목 조회 (ka10023)
+
+        Args:
+            market_type: 시장구분 (0:전체, 1:코스피, 2:코스닥)
+            limit: 조회할 종목 수
+
+        Returns:
+            list: 거래량 급증 종목 리스트
+        """
+        body = {
+            "mrkt_tp": market_type
+        }
+
+        result = self._make_request("POST", "/api/dostk/rank", "ka10023", body)
+
+        if result.get('return_code') == 0:
+            output_list = result.get('output', [])
+            return output_list[:limit]
+        else:
+            logger.warning(f"⚠️ 거래량 급증 조회 실패: {result.get('return_msg')}")
+            return []

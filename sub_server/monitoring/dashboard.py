@@ -143,6 +143,111 @@ async def get_uptime():
     return monitoring_service.get_uptime_info()
 
 
+@app.get("/api/stocks")
+async def get_collecting_stocks():
+    """수집 중인 종목 목록 조회"""
+    if not monitoring_service:
+        return JSONResponse(
+            status_code=503,
+            content={"error": "Monitoring service not initialized"}
+        )
+
+    return monitoring_service.get_collecting_stocks()
+
+
+@app.post("/api/stocks/add")
+async def add_stock(request: Request):
+    """
+    종목 동적 추가
+
+    Request Body:
+        {
+            "stock_code": "005930",
+            "stock_name": "삼성전자" (선택)
+        }
+    """
+    if not monitoring_service:
+        return JSONResponse(
+            status_code=503,
+            content={"error": "Monitoring service not initialized"}
+        )
+
+    if not monitoring_service.tick_collector:
+        return JSONResponse(
+            status_code=503,
+            content={"error": "Tick collector not initialized"}
+        )
+
+    try:
+        data = await request.json()
+        stock_code = data.get('stock_code', '').strip()
+        stock_name = data.get('stock_name', '').strip() or None
+
+        if not stock_code:
+            return JSONResponse(
+                status_code=400,
+                content={"error": "stock_code is required"}
+            )
+
+        if len(stock_code) != 6 or not stock_code.isdigit():
+            return JSONResponse(
+                status_code=400,
+                content={"error": "stock_code must be 6-digit number"}
+            )
+
+        # 종목 추가
+        result = monitoring_service.tick_collector.add_stock(stock_code, stock_name)
+
+        status_code = 200 if result['success'] else 400
+        return JSONResponse(status_code=status_code, content=result)
+
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={"error": f"Failed to add stock: {str(e)}"}
+        )
+
+
+@app.delete("/api/stocks/{stock_code}")
+async def remove_stock(stock_code: str):
+    """
+    종목 동적 제거
+
+    Path Parameter:
+        stock_code: 종목 코드 (6자리)
+    """
+    if not monitoring_service:
+        return JSONResponse(
+            status_code=503,
+            content={"error": "Monitoring service not initialized"}
+        )
+
+    if not monitoring_service.tick_collector:
+        return JSONResponse(
+            status_code=503,
+            content={"error": "Tick collector not initialized"}
+        )
+
+    try:
+        if len(stock_code) != 6 or not stock_code.isdigit():
+            return JSONResponse(
+                status_code=400,
+                content={"error": "stock_code must be 6-digit number"}
+            )
+
+        # 종목 제거
+        result = monitoring_service.tick_collector.remove_stock(stock_code)
+
+        status_code = 200 if result['success'] else 400
+        return JSONResponse(status_code=status_code, content=result)
+
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={"error": f"Failed to remove stock: {str(e)}"}
+        )
+
+
 @app.get("/dashboard", response_class=HTMLResponse)
 async def dashboard():
     """모니터링 대시보드 HTML"""
@@ -306,6 +411,155 @@ async def dashboard():
             border-radius: 4px;
             color: #856404;
         }
+
+        .stock-list {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 10px;
+        }
+
+        .stock-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 12px;
+            margin: 5px 0;
+            background: #f8f9fa;
+            border-radius: 6px;
+            border-left: 3px solid #667eea;
+            transition: all 0.2s;
+        }
+
+        .stock-item:hover {
+            background: #e9ecef;
+            border-left-color: #764ba2;
+            transform: translateX(5px);
+        }
+
+        .stock-code {
+            font-weight: bold;
+            color: #667eea;
+            font-family: 'Courier New', monospace;
+        }
+
+        .stock-name {
+            color: #333;
+            font-weight: 500;
+        }
+
+        .mode-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .mode-websocket {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .mode-polling {
+            background: #FF9800;
+            color: white;
+        }
+
+        .add-stock-form {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 2px dashed #667eea;
+        }
+
+        .add-stock-form input {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+
+        .add-stock-form input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        #stock-code-input {
+            width: 150px;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+        }
+
+        #stock-name-input {
+            flex: 1;
+        }
+
+        #add-stock-btn {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+
+        #add-stock-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        #add-stock-btn:active {
+            transform: translateY(0);
+        }
+
+        #add-stock-message {
+            padding: 10px;
+            border-radius: 6px;
+            margin: 10px 0;
+            font-size: 14px;
+            font-weight: 500;
+            display: none;
+        }
+
+        #add-stock-message.success {
+            display: block;
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        #add-stock-message.error {
+            display: block;
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .stock-item {
+            position: relative;
+        }
+
+        .remove-stock-btn {
+            padding: 4px 8px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-left: 10px;
+            transition: background 0.2s;
+        }
+
+        .remove-stock-btn:hover {
+            background: #c82333;
+        }
     </style>
 </head>
 <body>
@@ -342,6 +596,21 @@ async def dashboard():
                 <div class="card-title">🖥️ 시스템 리소스</div>
                 <div id="system-info">로딩 중...</div>
             </div>
+
+            <!-- 수집 종목 목록 -->
+            <div class="card" style="grid-column: span 2;">
+                <div class="card-title">📈 수집 종목 목록 <span id="collection-mode-badge"></span></div>
+
+                <!-- 종목 추가 폼 -->
+                <div class="add-stock-form">
+                    <input type="text" id="stock-code-input" placeholder="종목코드 (6자리)" maxlength="6" pattern="[0-9]{6}">
+                    <input type="text" id="stock-name-input" placeholder="종목명 (선택사항)">
+                    <button id="add-stock-btn" onclick="addStock()">➕ 종목 추가</button>
+                </div>
+                <div id="add-stock-message"></div>
+
+                <div id="stocks-list">로딩 중...</div>
+            </div>
         </div>
 
         <div class="refresh-info">
@@ -374,6 +643,16 @@ async def dashboard():
             }
         }
 
+        async function fetchStocks() {
+            try {
+                const response = await fetch('/api/stocks');
+                const stocksData = await response.json();
+                updateStocks(stocksData);
+            } catch (error) {
+                console.error('종목 조회 실패:', error);
+            }
+        }
+
         function updateHealth(health) {
             const healthDiv = document.getElementById('health-status');
             const statusClass = health.is_healthy ? 'status-healthy' : 'status-unhealthy';
@@ -395,6 +674,133 @@ async def dashboard():
             `;
         }
 
+        function updateStocks(stocksData) {
+            const stocksDiv = document.getElementById('stocks-list');
+            const modeBadge = document.getElementById('collection-mode-badge');
+
+            if (stocksData.status === 'error' || !stocksData.stocks || stocksData.stocks.length === 0) {
+                stocksDiv.innerHTML = '<div class="stat-value" style="text-align: center; color: #999;">수집 중인 종목이 없습니다</div>';
+                modeBadge.innerHTML = '';
+                return;
+            }
+
+            // 수집 모드 배지
+            const mode = stocksData.collection_mode || 'unknown';
+            const modeClass = mode === 'websocket' ? 'mode-websocket' : 'mode-polling';
+            const modeText = mode === 'websocket' ? 'WebSocket' : mode === 'polling' ? 'REST API 폴링' : mode;
+            modeBadge.innerHTML = `<span class="mode-badge ${modeClass}">${modeText}</span>`;
+
+            // 종목 목록 (제거 버튼 추가)
+            const stocksHTML = stocksData.stocks.map(stock => `
+                <div class="stock-item">
+                    <div>
+                        <span class="stock-code">${stock.stock_code}</span>
+                        <span class="stock-name">${stock.stock_name}</span>
+                    </div>
+                    <button class="remove-stock-btn" onclick="removeStock('${stock.stock_code}')">❌ 제거</button>
+                </div>
+            `).join('');
+
+            stocksDiv.innerHTML = `
+                <div class="stat">
+                    <span class="stat-label">총 종목 수</span>
+                    <span class="stat-value">${stocksData.stock_count}개</span>
+                </div>
+                <div class="stock-list">${stocksHTML}</div>
+            `;
+        }
+
+        async function addStock() {
+            const codeInput = document.getElementById('stock-code-input');
+            const nameInput = document.getElementById('stock-name-input');
+            const message = document.getElementById('add-stock-message');
+            const btn = document.getElementById('add-stock-btn');
+
+            const stockCode = codeInput.value.trim();
+            const stockName = nameInput.value.trim();
+
+            // 유효성 검사
+            if (!stockCode) {
+                showMessage('종목 코드를 입력해주세요', 'error');
+                return;
+            }
+
+            if (!/^[0-9]{6}$/.test(stockCode)) {
+                showMessage('종목 코드는 6자리 숫자여야 합니다', 'error');
+                return;
+            }
+
+            // 버튼 비활성화
+            btn.disabled = true;
+            btn.textContent = '추가 중...';
+
+            try {
+                const response = await fetch('/api/stocks/add', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        stock_code: stockCode,
+                        stock_name: stockName || null
+                    })
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.success) {
+                    showMessage(result.message, 'success');
+                    codeInput.value = '';
+                    nameInput.value = '';
+                    // 즉시 종목 목록 갱신
+                    fetchStocks();
+                } else {
+                    showMessage(result.message || result.error || '종목 추가 실패', 'error');
+                }
+            } catch (error) {
+                showMessage('서버 연결 오류: ' + error.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '➕ 종목 추가';
+            }
+        }
+
+        async function removeStock(stockCode) {
+            if (!confirm(`종목 ${stockCode}를 제거하시겠습니까?`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/stocks/${stockCode}`, {
+                    method: 'DELETE'
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.success) {
+                    showMessage(result.message, 'success');
+                    // 즉시 종목 목록 갱신
+                    fetchStocks();
+                } else {
+                    showMessage(result.message || result.error || '종목 제거 실패', 'error');
+                }
+            } catch (error) {
+                showMessage('서버 연결 오류: ' + error.message, 'error');
+            }
+        }
+
+        function showMessage(text, type) {
+            const message = document.getElementById('add-stock-message');
+            message.textContent = text;
+            message.className = type;
+
+            // 3초 후 메시지 자동 숨김
+            setTimeout(() => {
+                message.className = '';
+                message.style.display = 'none';
+            }, 3000);
+        }
+
         function updateDashboard(data) {
             // 가동 시간
             document.getElementById('uptime-info').innerHTML = `
@@ -413,10 +819,19 @@ async def dashboard():
             const statusClass = collector.is_running ? 'status-running' : 'status-stopped';
             const statusText = collector.is_running ? '실행 중' : '중지';
 
+            // 수집 모드 배지
+            const mode = collector.collection_mode || 'unknown';
+            const modeClass = mode === 'websocket' ? 'mode-websocket' : 'mode-polling';
+            const modeText = mode === 'websocket' ? 'WebSocket' : mode === 'polling' ? 'REST API 폴링' : mode;
+
             document.getElementById('collector-stats').innerHTML = `
                 <div class="stat">
                     <span class="stat-label">상태</span>
                     <span class="status-badge ${statusClass}">${statusText}</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">수집 모드</span>
+                    <span class="mode-badge ${modeClass}">${modeText}</span>
                 </div>
                 <div class="stat">
                     <span class="stat-label">총 수집</span>
@@ -493,11 +908,13 @@ async def dashboard():
         // 초기 로드
         fetchStatus();
         fetchHealth();
+        fetchStocks();
 
         // 5초마다 갱신
         setInterval(() => {
             fetchStatus();
             fetchHealth();
+            fetchStocks();
         }, 5000);
     </script>
 </body>

@@ -1,0 +1,51 @@
+# ============================================
+# Prometheus 설정 파일
+# ============================================
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: 'kium2'
+    environment: 'production'
+
+# Alertmanager 설정 (선택사항)
+# alerting:
+#   alertmanagers:
+#     - static_configs:
+#         - targets:
+#             - alertmanager:9093
+
+# 규칙 파일 (선택사항)
+# rule_files:
+#   - "rules/*.yml"
+
+# 스크래핑 설정
+scrape_configs:
+  # Prometheus 자체 모니터링
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Sub Server 모니터링
+  - job_name: 'sub-server'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['sub-server:8001']
+        labels:
+          service: 'sub-server'
+          component: 'data-collector'
+
+  # Redis 모니터링 (redis_exporter 필요 시)
+  # - job_name: 'redis'
+  #   static_configs:
+  #     - targets: ['redis-exporter:9121']
+  #       labels:
+  #         service: 'redis'
+
+  # MariaDB 모니터링 (mysqld_exporter 필요 시)
+  # - job_name: 'mariadb'
+  #   static_configs:
+  #     - targets: ['mysqld-exporter:9104']
+  #       labels:
+  #         service: 'mariadb'

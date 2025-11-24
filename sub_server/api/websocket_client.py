@@ -40,8 +40,13 @@ class KiwoomWebSocket:
             on_close=self._on_close
         )
 
-        # 백그라운드 스레드에서 실행
-        thread = threading.Thread(target=self.ws.run_forever)
+        # 백그라운드 스레드에서 실행 (ping_interval 추가로 연결 유지)
+        thread = threading.Thread(
+            target=lambda: self.ws.run_forever(
+                ping_interval=60,  # 60초마다 ping 전송
+                ping_timeout=10    # ping 응답 대기 시간
+            )
+        )
         thread.daemon = True
         thread.start()
 
@@ -81,7 +86,7 @@ class KiwoomWebSocket:
 
     def subscribe_tick(self, stock_codes: list, callback: Callable = None):
         """
-        실시간 체결 구독 (0B)
+        실시간 체결 구독 (0B - 주식 체결)
 
         Args:
             stock_codes: 종목코드 리스트 (예: ["005930", "000660"])
@@ -99,7 +104,7 @@ class KiwoomWebSocket:
         # 구독 목록 저장 (재연결용)
         self.subscribed_stocks = stock_codes
 
-        # 등록 메시지 전송
+        # 실시간 데이터 등록 메시지 (공식 가이드 형식)
         data_list = [
             {"item": f"KRX:{code}", "type": "0B"}
             for code in stock_codes
@@ -113,14 +118,17 @@ class KiwoomWebSocket:
                 "next-key": ""
             },
             "body": {
-                "trnm": "REG",
-                "grp_no": "0001",
-                "refresh": "1",
+                "trnm": "REG",      # 등록 (REG) / 해제 (REMOVE)
+                "grp_no": "0001",   # 그룹번호
+                "refresh": "1",     # 기존 유지
                 "data": data_list
             }
         }
 
-        self.ws.send(json.dumps(message))
+        message_json = json.dumps(message, ensure_ascii=False)
+        logger.info(f"📡 구독 메시지 전송: {message_json}")
+        self.ws.send(message_json)
+
         logger.info(f"📡 {len(stock_codes)}개 종목 실시간 체결 구독 완료")
 
     def subscribe_orderbook(self, stock_codes: list, callback: Callable = None):
@@ -200,44 +208,52 @@ class KiwoomWebSocket:
         try:
             data = json.loads(message)
 
-            # trnm이 REAL일 때만 실시간 데이터
-            if data.get('body', {}).get('trnm') == 'REAL':
-                for item in data['body']['data']:
-                    tr_type = item['type']
-                    stock_code = item['item']
-                    values = item['values']
+            # 모든 메시지 전체 로깅 (디버깅용)
+            logger.info(f"📨 WebSocket 메시지 전체 수신: {json.dumps(data, ensure_ascii=False)}")
+
+            body = data.get('body', {})
+
+            # 응답 코드 확인 (등록/해제 응답)
+            if 'return_code' in body:
+                if body['return_code'] != 0:
+                    logger.warning(f"⚠️ 서버 응답 오류: {body.get('return_msg', 'Unknown error')}")
+                else:
+                    logger.info(f"✅ 서버 응답 성공: {body.get('return_msg', 'Success')}")
+                return
+
+            # trnm이 REAL일 때만 실시간 데이터 처리
+            if body.get('trnm') == 'REAL':
+                for item in body.get('data', []):
+                    tr_type = item['type']  # 0B, 0D 등
+                    stock_code = item['item']  # 종목코드 (예: 005930)
+                    values = item['values']  # 필드번호:값 딕셔너리
 
                     # 콜백 실행
                     callback_key = f"{tr_type}:{stock_code}"
                     if callback_key in self.callbacks:
-                        # 체결 데이터 파싱
-                        if tr_type == "0B":
+                        if tr_type == '0B':  # 주식 체결
                             tick_data = {
                                 'stock_code': stock_code,
-                                'time': values.get('20', ''),
-                                'price': int(values.get('10', 0)),
-                                'volume': int(values.get('15', 0)),
-                                'change_rate': float(values.get('13', 0)),
-                                'high': int(values.get('19', 0)),
-                                'low': int(values.get('21', 0)),
-                                'open': int(values.get('18', 0)),
-                                'accumulated_volume': int(values.get('16', 0))
+                                'time': values.get('20', ''),          # 체결시간 (HHMMSS)
+                                'price': int(values.get('10', 0)),     # 현재가
+                                'volume': int(values.get('15', 0)),    # 거래량
+                                'change_rate': float(values.get('13', 0)),  # 등락율
+                                'high': int(values.get('19', 0)),      # 고가
+                                'low': int(values.get('21', 0)),       # 저가
+                                'open': int(values.get('18', 0)),      # 시가
+                                'accumulated_volume': int(values.get('16', 0))  # 누적거래량
                             }
+                            logger.info(f"✅ 체결 데이터 수신 [{stock_code}]: 가격={tick_data['price']}, 거래량={tick_data['volume']}")
                             self.callbacks[callback_key](tick_data)
 
-                        # 호가 데이터 파싱
-                        elif tr_type == "0D":
-                            orderbook_data = {
-                                'stock_code': stock_code,
-                                'ask_prices': [int(values.get(str(i), 0)) for i in range(51, 61)],
-                                'bid_prices': [int(values.get(str(i), 0)) for i in range(61, 71)],
-                                'ask_volumes': [int(values.get(str(i), 0)) for i in range(71, 81)],
-                                'bid_volumes': [int(values.get(str(i), 0)) for i in range(81, 91)]
-                            }
-                            self.callbacks[callback_key](orderbook_data)
+                        elif tr_type == '0D':  # 주식 호가
+                            # 호가 데이터 파싱 (필요시 구현)
+                            pass
 
         except Exception as e:
             logger.error(f"❌ 메시지 처리 오류: {e}")
+            import traceback
+            logger.error(traceback.format_exc())
 
     def _on_error(self, ws, error):
         logger.error(f"❌ WebSocket 에러: {error}")
