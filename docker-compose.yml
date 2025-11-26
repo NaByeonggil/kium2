@@ -1,5 +1,78 @@
 services:
   # ============================================
+  # Frontend - React 트레이딩 대시보드
+  # ============================================
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: kium2-frontend
+    ports:
+      - "${FRONTEND_PORT:-80}:80"
+    networks:
+      - kium2-network
+    restart: unless-stopped
+    depends_on:
+      - main-server
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:80"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ============================================
+  # Main Server - 트레이딩 API 서버
+  # ============================================
+  main-server:
+    build:
+      context: ./main_server
+      dockerfile: Dockerfile
+    container_name: kium2-main-server
+    ports:
+      - "${MAIN_SERVER_PORT:-8000}:8000"
+    environment:
+      # 키움 API 설정
+      - KIWOOM_APP_KEY=${KIWOOM_APP_KEY}
+      - KIWOOM_SECRET_KEY=${KIWOOM_SECRET_KEY}
+      - KIWOOM_IS_MOCK=${KIWOOM_IS_MOCK:-true}
+      - KIWOOM_API_BASE_URL=${KIWOOM_API_BASE_URL:-https://openapi.koreainvestment.com:9443}
+
+      # Sub Server 연결
+      - SUB_SERVER_URL=http://sub-server:8001
+
+      # 서버 설정
+      - MAIN_SERVER_PORT=8000
+      - PYTHONUNBUFFERED=1
+
+      # 데이터베이스 설정
+      - DB_HOST=mariadb
+      - DB_PORT=3306
+      - DB_USER=${DB_USER:-kium_user}
+      - DB_PASSWORD=${DB_PASSWORD:-kium_password}
+      - DB_NAME=${DB_NAME:-gslts_trading}
+
+      # 로깅 설정
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+    volumes:
+      - ./logs/main-server:/app/logs
+    networks:
+      - kium2-network
+    restart: unless-stopped
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    # Sub Server 없이도 시작 가능 (차트 기능만 제한)
+    # depends_on:
+    #   sub-server:
+    #     condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+
+  # ============================================
   # Sub Server - 틱데이터 수집 서버
   # ============================================
   sub-server:
@@ -140,6 +213,7 @@ services:
       - '--storage.tsdb.retention.time=15d'
     depends_on:
       - sub-server
+      - main-server
 
   # ============================================
   # Grafana - 모니터링 대시보드

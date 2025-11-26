@@ -27,6 +27,15 @@ scrape_configs:
     static_configs:
       - targets: ['localhost:9090']
 
+  # Main Server 모니터링
+  - job_name: 'main-server'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['main-server:8000']
+        labels:
+          service: 'main-server'
+          component: 'trading-api'
+
   # Sub Server 모니터링
   - job_name: 'sub-server'
     metrics_path: '/metrics'
@@ -35,6 +44,15 @@ scrape_configs:
         labels:
           service: 'sub-server'
           component: 'data-collector'
+
+  # Frontend 모니터링 (nginx)
+  - job_name: 'frontend'
+    metrics_path: '/stub_status'
+    static_configs:
+      - targets: ['frontend:80']
+        labels:
+          service: 'frontend'
+          component: 'web-ui'
 
   # Redis 모니터링 (redis_exporter 필요 시)
   # - job_name: 'redis'

@@ -1,0 +1,99 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: 'JetBrains Mono', Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: dark;
+  color: #e5e5e5;
+  background-color: #0f0f0f;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+/* 스크롤바 스타일 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1a1a1a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #404040;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #525252;
+}
+
+/* 숫자 입력 스피너 제거 */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* 상승/하락 색상 유틸리티 */
+.text-up {
+  color: #ef4444;
+}
+
+.text-down {
+  color: #3b82f6;
+}
+
+.bg-up {
+  background-color: #ef4444;
+}
+
+.bg-down {
+  background-color: #3b82f6;
+}
+
+/* 카드 스타일 */
+.card {
+  @apply bg-dark-card border border-dark-border rounded-lg;
+}
+
+/* 버튼 스타일 */
+.btn {
+  @apply px-4 py-2 rounded font-medium transition-colors duration-200;
+}
+
+.btn-buy {
+  @apply bg-up hover:bg-up-dark text-white;
+}
+
+.btn-sell {
+  @apply bg-down hover:bg-down-dark text-white;
+}
+
+.btn-secondary {
+  @apply bg-dark-border hover:bg-neutral text-dark-text;
+}
+
+/* 입력 스타일 */
+.input {
+  @apply bg-dark-bg border border-dark-border rounded px-3 py-2 text-dark-text
+         focus:outline-none focus:border-neutral transition-colors;
+}

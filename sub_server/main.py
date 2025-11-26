@@ -77,7 +77,15 @@ class SubServer:
         self.tick_collector = TickCollector(self.appkey, self.secretkey, self.is_mock)
         self.ranking_collector = RankingCollector(self.api_client)
 
-        # 3. 모니터링 대시보드 시작
+        # 3. 주요 종목 마스터 데이터 초기화
+        logger.info("📊 주요 종목 마스터 데이터 초기화 중...")
+        storage = TickStorageService()
+        try:
+            storage.init_stock_master()
+        finally:
+            storage.close()
+
+        # 4. 모니터링 대시보드 시작
         self._start_monitoring_dashboard()
 
         logger.info("✅ 초기화 완료\n")
@@ -178,13 +186,16 @@ class SubServer:
 
             logger.info(f"✅ 수집 대상: {len(stock_codes)}개 종목\n")
 
-            # 2. 종목 마스터 정보 저장
+            # 2. 종목 마스터 정보 저장 (시장 구분 포함)
             from sub_server.services.storage_service import TickStorageService
             storage = TickStorageService()
             try:
+                logger.info("📊 시장 구분 정보 조회 중...")
                 for code, name in stock_info.items():
-                    storage.insert_stock_master(code, name, "KRX")
-                logger.info(f"✅ 종목 마스터 정보 저장 완료: {len(stock_info)}개")
+                    # API에서 시장 구분 조회
+                    market_type = self.api_client.get_market_type(code)
+                    storage.insert_stock_master(code, name, market_type)
+                logger.info(f"✅ 종목 마스터 정보 저장 완료: {len(stock_info)}개 (시장 구분 포함)")
             except Exception as e:
                 logger.warning(f"⚠️ 종목 마스터 저장 실패: {e}")
             finally:

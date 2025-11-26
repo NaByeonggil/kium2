@@ -159,6 +159,38 @@ class TickStorageService:
             self.connection.rollback()
             logger.error(f"❌ 종목 마스터 등록 실패: {e}")
 
+    def get_stock_market_types(self, stock_codes: List[str]) -> Dict[str, str]:
+        """
+        종목들의 시장 구분 조회
+
+        Args:
+            stock_codes: 종목코드 리스트
+
+        Returns:
+            dict: {종목코드: 시장구분} (KOSPI, KOSDAQ, ETF, KRX 등)
+        """
+        if not stock_codes:
+            return {}
+
+        self._ensure_connection()
+
+        # IN 절을 위한 플레이스홀더 생성
+        placeholders = ', '.join(['%s'] * len(stock_codes))
+        sql = f"""
+        SELECT stock_code, market_type
+        FROM stock_master
+        WHERE stock_code IN ({placeholders})
+        """
+
+        try:
+            with self.connection.cursor() as cursor:
+                cursor.execute(sql, stock_codes)
+                results = cursor.fetchall()
+                return {row['stock_code']: row['market_type'] for row in results}
+        except Error as e:
+            logger.error(f"❌ 시장 구분 조회 실패: {e}")
+            return {}
+
     def insert_trading_volume_rank(self, rank_data: List[Dict]):
         """
         거래대금 랭킹 저장
@@ -278,3 +310,141 @@ class TickStorageService:
         except Error as e:
             logger.error(f"❌ DB 크기 조회 실패: {e}")
             return "Unknown"
+
+    def search_stocks(self, keyword: str, limit: int = 20) -> List[Dict]:
+        """
+        종목 검색 (종목명 또는 종목코드로 검색)
+
+        Args:
+            keyword: 검색어 (종목명 또는 종목코드)
+            limit: 최대 결과 수
+
+        Returns:
+            List[Dict]: 검색된 종목 리스트
+        """
+        if not keyword:
+            return []
+
+        self._ensure_connection()
+
+        sql = """
+        SELECT stock_code, stock_name, market_type
+        FROM stock_master
+        WHERE stock_code LIKE %s OR stock_name LIKE %s
+        ORDER BY
+            CASE
+                WHEN stock_code = %s THEN 0
+                WHEN stock_code LIKE %s THEN 1
+                WHEN stock_name = %s THEN 2
+                WHEN stock_name LIKE %s THEN 3
+                ELSE 4
+            END,
+            stock_name
+        LIMIT %s
+        """
+
+        search_pattern = f"%{keyword}%"
+        starts_with = f"{keyword}%"
+
+        try:
+            with self.connection.cursor() as cursor:
+                cursor.execute(sql, (
+                    search_pattern,  # stock_code LIKE
+                    search_pattern,  # stock_name LIKE
+                    keyword,         # exact stock_code match
+                    starts_with,     # stock_code starts with
+                    keyword,         # exact stock_name match
+                    starts_with,     # stock_name starts with
+                    limit
+                ))
+                results = cursor.fetchall()
+                return results
+
+        except Error as e:
+            logger.error(f"❌ 종목 검색 실패: {e}")
+            return []
+
+    def get_all_stocks(self) -> List[Dict]:
+        """
+        모든 종목 조회
+
+        Returns:
+            List[Dict]: 전체 종목 리스트
+        """
+        self._ensure_connection()
+
+        sql = """
+        SELECT stock_code, stock_name, market_type
+        FROM stock_master
+        ORDER BY stock_name
+        """
+
+        try:
+            with self.connection.cursor() as cursor:
+                cursor.execute(sql)
+                results = cursor.fetchall()
+                return results
+
+        except Error as e:
+            logger.error(f"❌ 전체 종목 조회 실패: {e}")
+            return []
+
+    def init_stock_master(self):
+        """
+        주요 종목 마스터 데이터 초기화
+        서버 시작 시 호출하여 기본 종목 데이터를 DB에 저장
+        """
+        # 주요 코스피 종목
+        kospi_stocks = {
+            '005930': '삼성전자', '000660': 'SK하이닉스', '035420': 'NAVER', '005380': '현대차', '051910': 'LG화학',
+            '006400': '삼성SDI', '035720': '카카오', '068270': '셀트리온', '207940': '삼성바이오로직스', '005490': 'POSCO홀딩스',
+            '003670': '포스코퓨처엠', '000270': '기아', '105560': 'KB금융', '028260': '삼성물산', '055550': '신한지주',
+            '012330': '현대모비스', '066570': 'LG전자', '003550': 'LG', '096770': 'SK이노베이션', '032830': '삼성생명',
+            '017670': 'SK텔레콤', '034730': 'SK', '009150': '삼성전기', '018260': '삼성에스디에스', '086790': '하나금융지주',
+            '015760': '한국전력', '010130': '고려아연', '033780': 'KT&G', '011200': 'HMM', '010950': 'S-Oil',
+            '009540': '한국조선해양', '000810': '삼성화재', '036570': '엔씨소프트', '024110': '기업은행', '004020': '현대제철',
+            '010140': '삼성중공업', '002790': '아모레퍼시픽', '034020': '두산에너빌리티', '047050': '포스코인터내셔널', '090430': '아모레G',
+            '326030': 'SK바이오팜', '003490': '대한항공', '000100': '유한양행', '011070': 'LG이노텍', '036460': '한국가스공사',
+            '316140': '우리금융지주', '161390': '한국타이어앤테크놀로지', '259960': '크래프톤', '030200': 'KT', '352820': '하이브',
+            '071050': '한국금융지주', '097950': 'CJ제일제당', '010620': '현대건설', '251270': '넷마블', '180640': '한진칼',
+            '004170': '신세계', '000720': '현대건설', '003410': '쌍용C&E', '021240': '코웨이', '008930': '한미사이언스',
+            '016360': '삼성증권', '138040': '메리츠금융지주', '139480': '이마트', '009830': '한화솔루션', '047810': '한국항공우주',
+            '042660': '한화오션', '060250': 'NHN KCP', '373220': 'LG에너지솔루션', '000880': '한화', '001570': '금양',
+            '000270': '기아', '020150': '롯데에너지머티리얼즈', '006800': '미래에셋증권', '323410': '카카오뱅크', '112610': '씨에스윈드',
+        }
+
+        # 주요 코스닥 종목
+        kosdaq_stocks = {
+            '247540': '에코프로비엠', '086520': '에코프로', '091990': '셀트리온헬스케어', '035760': 'CJ ENM', '293490': '카카오게임즈',
+            '041510': '에스엠', '028300': 'HLB', '112040': '위메이드', '145020': '휴젤', '196170': '알테오젠',
+            '215600': '신라젠', '357780': '솔루스첨단소재', '039030': '이오테크닉스', '263750': '펄어비스', '403870': 'HPSP',
+            '095340': 'ISC', '058610': '어스바이오', '096530': '씨젠', '277810': '레인보우로보틱스', '072770': '율촌화학',
+            '038390': '레드캡투어', '067310': '하나마이크론', '064760': '티씨케이', '352480': '씨앤씨인터내셔널', '950210': '프레스티지바이오파마',
+            '140860': '파크시스템스', '340570': '티앤엘', '417500': '엔켐', '039440': '에스티아이', '323280': '태성',
+            '226330': '신테카바이오', '460850': '파두', '060310': '3S', '014620': '성광벤드', '078140': '대봉엘에스',
+            '032640': 'LG유플러스', '086900': '메디톡스', '048410': '현대바이오', '299660': '삼기이브이', '228760': '지노믹트리',
+            '114190': '강원에너지', '222080': '씨아이에스', '317530': '캐리소프트', '041020': '폴라리스오피스', '214450': '파마리서치',
+            '083310': '엘오티베큠', '222800': '심텍', '035900': 'JYP Ent.', '122870': '와이지엔터테인먼트', '241560': '두산퓨얼셀',
+            '131970': '두산테스나', '078600': '대주전자재료', '298380': 'ABL바이오', '141080': '레고켐바이오', '237690': '에스티팜',
+        }
+
+        try:
+            self._ensure_connection()
+
+            count = 0
+            # 코스피 종목 저장
+            for code, name in kospi_stocks.items():
+                self.insert_stock_master(code, name, 'KOSPI')
+                count += 1
+
+            # 코스닥 종목 저장
+            for code, name in kosdaq_stocks.items():
+                self.insert_stock_master(code, name, 'KOSDAQ')
+                count += 1
+
+            logger.info(f"✅ 주요 종목 마스터 데이터 초기화 완료: {count}개")
+            return count
+
+        except Error as e:
+            logger.error(f"❌ 종목 마스터 초기화 실패: {e}")
+            return 0

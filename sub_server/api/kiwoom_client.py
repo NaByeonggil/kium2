@@ -269,6 +269,62 @@ class KiwoomAPIClient:
 
         return self._make_request("POST", "/api/dostk/stkinfo", "ka10001", body)
 
+    def get_market_type(self, stock_code: str) -> str:
+        """
+        종목의 시장 구분 조회 (캐싱 사용)
+
+        Args:
+            stock_code: 종목 코드
+
+        Returns:
+            str: KOSPI, KOSDAQ, ETF, ETN, 또는 KRX (알 수 없는 경우)
+        """
+        # 캐시가 없으면 초기화
+        if not hasattr(self, '_market_cache'):
+            self._market_cache = {}
+            self._load_market_cache()
+
+        # 캐시에서 조회
+        if stock_code in self._market_cache:
+            return self._market_cache[stock_code]
+
+        # 캐시에 없으면 다시 로드 시도 후 조회
+        self._load_market_cache()
+        return self._market_cache.get(stock_code, "KRX")
+
+    def _load_market_cache(self):
+        """시장 구분 캐시 로드"""
+        try:
+            # 코스피 종목 조회
+            kospi_result = self.get_stock_list("1")
+            if kospi_result.get('return_code') == 0:
+                for item in kospi_result.get('output', []):
+                    code = item.get('stk_cd')
+                    if code:
+                        self._market_cache[code] = "KOSPI"
+                logger.info(f"✅ 코스피 종목 {len(kospi_result.get('output', []))}개 캐싱")
+
+            # 코스닥 종목 조회
+            kosdaq_result = self.get_stock_list("2")
+            if kosdaq_result.get('return_code') == 0:
+                for item in kosdaq_result.get('output', []):
+                    code = item.get('stk_cd')
+                    if code:
+                        self._market_cache[code] = "KOSDAQ"
+                logger.info(f"✅ 코스닥 종목 {len(kosdaq_result.get('output', []))}개 캐싱")
+
+            # ETF 조회
+            etf_result = self.get_stock_list("3")
+            if etf_result.get('return_code') == 0:
+                for item in etf_result.get('output', []):
+                    code = item.get('stk_cd')
+                    if code:
+                        self._market_cache[code] = "ETF"
+                logger.info(f"✅ ETF 종목 {len(etf_result.get('output', []))}개 캐싱")
+
+        except Exception as e:
+            logger.warning(f"⚠️ 시장 구분 캐시 로드 실패: {e}")
+
     def get_orderbook(self, stock_code: str, exchange: str = "KRX") -> Dict:
         """호가 조회"""
         body = {
@@ -350,6 +406,105 @@ class KiwoomAPIClient:
         }
 
         return self._make_request("POST", "/api/dostk/stkinfo", "ka10099", body)
+
+    def search_stocks(self, keyword: str, limit: int = 20) -> List[Dict]:
+        """
+        종목 검색 (종목명 또는 종목코드로 검색)
+
+        Args:
+            keyword: 검색어 (종목명 또는 종목코드)
+            limit: 최대 검색 결과 수
+
+        Returns:
+            List[Dict]: 검색된 종목 리스트
+                [{'stock_code': '005930', 'stock_name': '삼성전자', 'market_type': 'KOSPI'}, ...]
+        """
+        # 캐시가 없으면 초기화
+        if not hasattr(self, '_stock_list_cache') or not self._stock_list_cache:
+            self._load_stock_list_cache()
+
+        if not self._stock_list_cache:
+            logger.warning("종목 리스트 캐시가 비어있습니다")
+            return []
+
+        keyword_upper = keyword.upper()
+        keyword_lower = keyword.lower()
+        results = []
+
+        for stock in self._stock_list_cache:
+            code = stock.get('stock_code', '')
+            name = stock.get('stock_name', '')
+
+            # 종목 코드로 검색 (정확히 일치하거나 포함)
+            if keyword in code:
+                results.append(stock)
+            # 종목명으로 검색 (포함)
+            elif keyword in name or keyword_upper in name.upper():
+                results.append(stock)
+
+            if len(results) >= limit:
+                break
+
+        return results
+
+    def _load_stock_list_cache(self):
+        """전체 종목 리스트 캐시 로드"""
+        self._stock_list_cache = []
+
+        try:
+            # 코스피 종목 조회
+            kospi_result = self.get_stock_list("1")
+            if kospi_result.get('return_code') == 0:
+                for item in kospi_result.get('output', []):
+                    code = item.get('stk_cd', '')
+                    name = item.get('stk_nm', '')
+                    if code and name:
+                        self._stock_list_cache.append({
+                            'stock_code': code,
+                            'stock_name': name,
+                            'market_type': 'KOSPI'
+                        })
+                        # 마켓 캐시에도 추가
+                        if hasattr(self, '_market_cache'):
+                            self._market_cache[code] = 'KOSPI'
+                logger.info(f"✅ 코스피 종목 {len(kospi_result.get('output', []))}개 로드")
+
+            # 코스닥 종목 조회
+            kosdaq_result = self.get_stock_list("2")
+            if kosdaq_result.get('return_code') == 0:
+                for item in kosdaq_result.get('output', []):
+                    code = item.get('stk_cd', '')
+                    name = item.get('stk_nm', '')
+                    if code and name:
+                        self._stock_list_cache.append({
+                            'stock_code': code,
+                            'stock_name': name,
+                            'market_type': 'KOSDAQ'
+                        })
+                        if hasattr(self, '_market_cache'):
+                            self._market_cache[code] = 'KOSDAQ'
+                logger.info(f"✅ 코스닥 종목 {len(kosdaq_result.get('output', []))}개 로드")
+
+            # ETF 종목 조회
+            etf_result = self.get_stock_list("3")
+            if etf_result.get('return_code') == 0:
+                for item in etf_result.get('output', []):
+                    code = item.get('stk_cd', '')
+                    name = item.get('stk_nm', '')
+                    if code and name:
+                        self._stock_list_cache.append({
+                            'stock_code': code,
+                            'stock_name': name,
+                            'market_type': 'ETF'
+                        })
+                        if hasattr(self, '_market_cache'):
+                            self._market_cache[code] = 'ETF'
+                logger.info(f"✅ ETF 종목 {len(etf_result.get('output', []))}개 로드")
+
+            logger.info(f"📊 전체 종목 캐시 로드 완료: {len(self._stock_list_cache)}개")
+
+        except Exception as e:
+            logger.warning(f"⚠️ 종목 리스트 캐시 로드 실패: {e}")
 
     # ========== 순위/랭킹 정보 ==========
 

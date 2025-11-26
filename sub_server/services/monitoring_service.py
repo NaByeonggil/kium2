@@ -100,12 +100,14 @@ class MonitoringService:
         현재 수집 중인 종목 목록 조회
 
         Returns:
-            dict: 수집 중인 종목 정보
+            dict: 수집 중인 종목 정보 (시장 구분 포함)
         """
         if not self.tick_collector:
             return {
                 'status': 'not_initialized',
                 'stocks': [],
+                'kospi': [],
+                'kosdaq': [],
                 'stock_count': 0
             }
 
@@ -113,19 +115,91 @@ class MonitoringService:
             stock_codes = self.tick_collector.stock_codes or []
             stock_info = self.tick_collector.stock_info or {}
 
-            # 종목 정보 구성
-            stocks_with_names = []
+            # DB에서 시장 구분 정보 조회
+            market_types = {}
+            if stock_codes:
+                try:
+                    market_types = self.storage.get_stock_market_types(stock_codes)
+                except Exception as e:
+                    logger.warning(f"시장 구분 조회 실패: {e}")
+
+            # 시장 구분 판별 함수 (DB에 없거나 KRX인 경우 코드로 판별)
+            def get_market_type(code: str) -> str:
+                db_market = market_types.get(code, 'KRX').upper()
+                if db_market in ('KOSPI', 'KOSDAQ', 'ETF'):
+                    return db_market
+
+                # 주요 코스피 종목 (코드 패턴으로 판별 어려운 경우)
+                kospi_codes = {
+                    '005930', '000660', '035420', '005380', '051910',  # 삼성전자, SK하이닉스, NAVER, 현대차, LG화학
+                    '006400', '035720', '068270', '207940', '005490',  # 삼성SDI, 카카오, 셀트리온, 삼성바이오로직스, POSCO홀딩스
+                    '003670', '000270', '105560', '028260', '055550',  # 포스코퓨처엠, 기아, KB금융, 삼성물산, 신한지주
+                    '012330', '066570', '003550', '096770', '032830',  # 현대모비스, LG전자, LG, SK이노베이션, 삼성생명
+                    '017670', '034730', '009150', '018260', '086790',  # SK텔레콤, SK, 삼성전기, 삼성에스디에스, 하나금융지주
+                    '015760', '010130', '033780', '011200', '010950',  # 한국전력, 고려아연, KT&G, HMM, S-Oil
+                    '009540', '000810', '036570', '024110', '004020',  # 한국조선해양, 삼성화재, 엔씨소프트, 기업은행, 현대제철
+                    '010140', '002790', '034020', '047050', '090430',  # 삼성중공업, 아모레퍼시픽, 두산에너빌리티, 포스코인터내셔널, 아모레G
+                    '326030', '003490', '000100', '011070', '036460',  # SK바이오팜, 대한항공, 유한양행, LG이노텍, 한국가스공사
+                    '316140', '161390', '259960', '030200', '352820',  # 우리금융지주, 한국타이어앤테크놀로지, 크래프톤, KT, 하이브
+                    '071050', '097950', '010620', '251270', '180640',  # 한국금융지주, CJ제일제당, 현대건설, 넷마블, 한진칼
+                    '004170', '000720', '003410', '021240', '008930',  # 신세계, 현대건설, 쌍용C&E, 코웨이, 한미사이언스
+                    '016360', '138040', '139480', '009830', '047810',  # 삼성증권, 메리츠금융지주, 이마트, 한화솔루션, 한국항공우주
+                    '042660', '060250',  # 한화오션, NHN KCP
+                }
+
+                # 주요 코스닥 종목
+                kosdaq_codes = {
+                    '247540', '086520', '091990', '035760', '293490',  # 에코프로비엠, 에코프로, 셀트리온헬스케어, CJ ENM, 카카오게임즈
+                    '041510', '028300', '112040', '145020', '196170',  # 에스엠, HLB, 위메이드, 휴젤, 알테오젠
+                    '215600', '357780', '039030', '263750', '403870',  # 신라젠, 솔루스첨단소재, 이오테크닉스, 펄어비스, HPSP
+                    '095340',  # ISC
+                }
+
+                if code in kospi_codes:
+                    return 'KOSPI'
+                elif code in kosdaq_codes:
+                    return 'KOSDAQ'
+
+                # 코드 패턴 기반 추정 (fallback)
+                # 일반적으로 0으로 시작하면 코스피 가능성 높음
+                if code.startswith('0'):
+                    return 'KOSPI'
+
+                return 'KRX'
+
+            # 종목 정보 구성 (시장별 분류)
+            kospi_list = []
+            kosdaq_list = []
+            other_stocks = []
+
             if stock_codes:
                 for code in stock_codes:
-                    stocks_with_names.append({
+                    market = get_market_type(code)
+                    stock_data = {
                         'stock_code': code,
-                        'stock_name': stock_info.get(code, '-')
-                    })
+                        'stock_name': stock_info.get(code, '-'),
+                        'market_type': market
+                    }
+
+                    if market == 'KOSPI':
+                        kospi_list.append(stock_data)
+                    elif market == 'KOSDAQ':
+                        kosdaq_list.append(stock_data)
+                    else:
+                        other_stocks.append(stock_data)
+
+            # 전체 종목 목록 (하위 호환성)
+            all_stocks = kospi_list + kosdaq_list + other_stocks
 
             return {
                 'status': 'success',
-                'stocks': stocks_with_names,
+                'stocks': all_stocks,
+                'kospi': kospi_list,
+                'kosdaq': kosdaq_list,
+                'other': other_stocks,
                 'stock_count': len(stock_codes),
+                'kospi_count': len(kospi_list),
+                'kosdaq_count': len(kosdaq_list),
                 'collection_mode': self.tick_collector.collection_mode
             }
         except Exception as e:
@@ -133,6 +207,8 @@ class MonitoringService:
             return {
                 'status': 'error',
                 'stocks': [],
+                'kospi': [],
+                'kosdaq': [],
                 'stock_count': 0,
                 'error_message': str(e)
             }

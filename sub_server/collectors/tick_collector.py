@@ -366,11 +366,19 @@ class TickCollector:
             except Exception as e:
                 logger.error(f"❌ WebSocket 구독 실패: {e}")
 
+        # 시장 구분 조회
+        market_type = "KRX"
+        try:
+            market_type = self.api_client.get_market_type(stock_code)
+            logger.debug(f"종목 {stock_code} 시장 구분: {market_type}")
+        except Exception as e:
+            logger.warning(f"⚠️ 시장 구분 조회 실패: {e}")
+
         # 종목 마스터 정보 저장
         try:
             from sub_server.services.storage_service import TickStorageService
             storage = TickStorageService()
-            storage.insert_stock_master(stock_code, stock_name, "KRX")
+            storage.insert_stock_master(stock_code, stock_name, market_type)
             storage.close()
         except Exception as e:
             logger.warning(f"⚠️ 종목 마스터 저장 실패: {e}")

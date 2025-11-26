@@ -26,6 +26,7 @@ build/
 # Logs
 *.log
 logs/
+*/logs/
 
 # Database
 *.db
@@ -39,6 +40,9 @@ Thumbs.db
 node_modules/
 .next/
 out/
+dist/
+.vite/
+*.local
 
 # Test coverage
 .coverage
